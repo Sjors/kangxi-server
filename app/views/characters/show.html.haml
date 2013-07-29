@@ -1,0 +1,9 @@
+%p#notice= notice
+
+%p
+  %b Simplified:
+  = @character.simplified
+
+= link_to 'Edit', edit_character_path(@character)
+\|
+= link_to 'Back', characters_path
