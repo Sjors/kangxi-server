@@ -1,0 +1,23 @@
+%h1 Listing radicals
+
+%table
+  %tr
+    %th Position
+    %th Simplified
+    %th Variant
+    %th
+    %th
+    %th
+
+  - @radicals.each do |radical|
+    %tr
+      %td= radical.position
+      %td= radical.simplified
+      %td= radical.variant
+      %td= link_to 'Show', radical
+      %td= link_to 'Edit', edit_radical_path(radical)
+      %td= link_to 'Destroy', radical, :method => :delete, :data => { :confirm => 'Are you sure?' }
+
+%br
+
+= link_to 'New Radical', new_radical_path

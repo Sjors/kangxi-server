@@ -1,0 +1,10 @@
+= simple_form_for(@radical) do |f|
+  = f.error_notification
+
+  .form-inputs
+    = f.input :position
+    = f.input :simplified
+    = f.input :variant
+
+  .form-actions
+    = f.button :submit

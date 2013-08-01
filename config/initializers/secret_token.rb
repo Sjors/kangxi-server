@@ -9,4 +9,4 @@
 
 # Make sure your secret_key_base is kept private
 # if you're sharing your code publicly.
-RailsBootstrap::Application.config.secret_key_base = 'bd907de450d9d71a05283cfad094217b3664a6a3ba7e3a55589c9342fa0a39992aa5f704bf5fbe84288b91dec98fdc888e17a3772599be0843bf9ae1f5ee2749'
+ChineseCharacterLookup::Application.config.secret_key_base = 'bd907de450d9d71a05283cfad094217b3664a6a3ba7e3a55589c9342fa0a39992aa5f704bf5fbe84288b91dec98fdc888e17a3772599be0843bf9ae1f5ee2749'

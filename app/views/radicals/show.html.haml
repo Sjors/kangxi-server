@@ -1,0 +1,15 @@
+%p#notice= notice
+
+%p
+  %b Position:
+  = @radical.position
+%p
+  %b Simplified:
+  = @radical.simplified
+%p
+  %b Variant:
+  = @radical.variant
+
+= link_to 'Edit', edit_radical_path(@radical)
+\|
+= link_to 'Back', radicals_path

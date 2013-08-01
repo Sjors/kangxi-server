@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-RailsBootstrap::Application.load_tasks
+ChineseCharacterLookup::Application.load_tasks
