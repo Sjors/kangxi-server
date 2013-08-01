@@ -1,4 +1,3 @@
-%h1 Listing radicals
 %p
   At the moment, the order is based on 
   = link_to "this list", "http://www.hackingchinese.com/?p=2839"
@@ -21,7 +20,9 @@
         = Radical.where(position: radical.position, variant: true).collect{|r|r.simplified}.join(", ")
       %td
         = PinYin.of_string(radical.simplified, :unicode).first
-      %td= link_to "Show", radical
+      - if can? :show, radical
+        %td= link_to "Show", radical
 %br
 
-= link_to 'New Radical', new_radical_path
+- if can? :create, Radical
+  = link_to 'New Radical', new_radical_path
