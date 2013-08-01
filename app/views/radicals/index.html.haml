@@ -26,3 +26,6 @@
 
 - if can? :create, Radical
   = link_to 'New Radical', new_radical_path
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Radicals");
