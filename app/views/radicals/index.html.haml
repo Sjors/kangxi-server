@@ -1,23 +1,27 @@
 %h1 Listing radicals
-
+%p
+  At the moment, the order is based on 
+  = link_to "this list", "http://www.hackingchinese.com/?p=2839"
+  of the 100 most common radicals.
+%p 
+  Tip: use the 
+  = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
+  plugin for Google Chrome and hover over the radical for more info. 
 %table
   %tr
-    %th Position
     %th Simplified
-    %th Variant
-    %th
-    %th
-    %th
+    %th Variants
+    %th Pinyin
+    %th 
 
   - @radicals.each do |radical|
     %tr
-      %td= radical.position
-      %td= radical.simplified
-      %td= radical.variant
-      %td= link_to 'Show', radical
-      %td= link_to 'Edit', edit_radical_path(radical)
-      %td= link_to 'Destroy', radical, :method => :delete, :data => { :confirm => 'Are you sure?' }
-
+      %td.chinese= link_to radical.simplified, "http://en.wikipedia.org/wiki/Radical_#{ radical.position }"
+      %td.chinese
+        = Radical.where(position: radical.position, variant: true).collect{|r|r.simplified}.join(", ")
+      %td
+        = PinYin.of_string(radical.simplified, :unicode).first
+      %td= link_to "Show", radical
 %br
 
 = link_to 'New Radical', new_radical_path

@@ -4,7 +4,7 @@ class RadicalsController < ApplicationController
   # GET /radicals
   # GET /radicals.json
   def index
-    @radicals = Radical.all
+    @radicals = Radical.where(variant: false)
   end
 
   # GET /radicals/1
@@ -28,7 +28,7 @@ class RadicalsController < ApplicationController
 
     respond_to do |format|
       if @radical.save
-        format.html { redirect_to @radical, notice: 'Radical was successfully created.' }
+        format.html { redirect_to new_radical_path, notice: 'Successfully added ' + @radical.simplified + '.' }
         format.json { render action: 'show', status: :created, location: @radical }
       else
         format.html { render action: 'new' }

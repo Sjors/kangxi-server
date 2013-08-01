@@ -14,6 +14,9 @@ gem 'high_voltage'
 gem 'simple_form', '>= 3.0.0.rc'
 gem 'pg'
 gem 'ruby-pinyin'
+gem 'devise', "~> 3.0.0"
+gem 'cancan'
+
 
 group :test do
   gem 'guard-bundler'
