@@ -1,18 +1,20 @@
 %h1 Listing characters
 
+%p 
+  Tip: use the 
+  = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
+  plugin for Google Chrome to see meaning and hear the pronunciation.
+
 %table
   %tr
-    %th Simplified
-    %th
+    %th 
     %th
     %th
 
   - @characters.each do |character|
     %tr
-      %td= character.simplified
-      %td= link_to 'Show', character
-      %td= link_to 'Edit', edit_character_path(character)
-      %td= link_to 'Destroy', character, :method => :delete, :data => { :confirm => 'Are you sure?' }
+      %td.chinese= link_to character.simplified, character
+      %td= link_to PinYin.of_string(character.simplified, :unicode).first, "http://en.wiktionary.org/wiki/#{character.simplified}#Mandarin", :target => "_blank"
 
 %br
 

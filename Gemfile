@@ -13,19 +13,24 @@ gem 'haml-rails'
 gem 'high_voltage'
 gem 'simple_form', '>= 3.0.0.rc'
 gem 'pg'
+gem 'ruby-pinyin'
 
-group :development do
-  gem 'better_errors'
-  gem 'binding_of_caller', :platforms=>[:mri_19, :rbx]
-  gem "factory_girl_rails"
-  gem "capybara"
-  gem 'poltergeist'
-  gem 'phantomjs', :require => 'phantomjs/poltergeist'
+group :test do
   gem 'guard-bundler'
   gem 'guard-rails'
   gem 'guard-rspec'
   gem 'rspec-rails'
   gem 'terminal-notifier-guard' # Mac
+  gem "factory_girl_rails"
+  
+end
+
+group :development do
+  gem 'better_errors'
+  gem 'binding_of_caller', :platforms=>[:mri_19, :rbx]
+  gem "capybara"
+  gem 'poltergeist'
+  gem 'phantomjs', :require => 'phantomjs/poltergeist'
   gem 'html2haml'
   gem 'quiet_assets'
   gem 'rb-fchange', :require=>false

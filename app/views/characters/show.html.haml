@@ -1,9 +1,9 @@
 %p#notice= notice
 
-%p
-  %b Simplified:
+%h1.chinese
   = @character.simplified
-
+%br
+= link_to PinYin.of_string(@character.simplified, :unicode).first, "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin"
+%br
+%hr
 = link_to 'Edit', edit_character_path(@character)
-\|
-= link_to 'Back', characters_path
