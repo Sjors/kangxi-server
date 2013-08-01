@@ -8,15 +8,25 @@
         = javascript_include_tag "application"
         = csrf_meta_tags
   %body
-    %header.navbar.navbar-fixed-top
-      %nav.navbar-inner
+    #wrap
+      %header.navbar.navbar-fixed-top
+        %nav.navbar-inner
+          .container
+            = render 'layouts/navigation'
+      %main{:role => "main"}
         .container
-          = render 'layouts/navigation'
-    %main{:role => "main"}
+          .content
+            .row
+              .span12
+                = render 'layouts/messages'
+                = yield
+      #push
+    #footer
       .container
-        .content
-          .row
-            .span12
-              = render 'layouts/messages'
-              = yield
-          %footer
+        %p.muted.credit
+          Brought to you by Sjors Provoost a.k.a. 
+          = link_to("Purple Dunes", "http://purpledunes.com/") + "."
+          You can also checkout my personal 
+          = link_to("Twitter", "http://twitter.com/provoost")
+          and 
+          = link_to("blog", "http://sprovoost.nl/") + "."
