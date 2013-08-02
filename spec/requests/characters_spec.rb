@@ -2,8 +2,12 @@ require 'spec_helper'
 include Helpers
 
 describe "Characters" do
-  it "goes to list of characters from main screen" do
+  let(:admin) { FactoryGirl.create(:admin) }
+  
+  it "goes to list of characters from main screen when admin is logged in" do
     FactoryGirl.create(:character, :simplified => "人")
+    login(admin)
+    
     visit "/"
     click_link "Characters"
     page.should have_content "人"
@@ -11,6 +15,8 @@ describe "Characters" do
   
   describe "Add character" do
     it "adds a character and allows another to be added" do
+      login(admin)
+      
       
       visit new_character_path
       fill_in "Simplified", :with => "人"
