@@ -3,4 +3,6 @@ class Radical < ActiveRecord::Base
   validates_length_of :simplified, :is => 1
   validates :position, :inclusion => 1..214
   validates_uniqueness_of :position, :unless => :variant, :message => "has already been taken. Is this a variant?"
+
+  has_and_belongs_to_many :characters
 end

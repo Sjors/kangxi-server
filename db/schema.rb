@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130801193823) do
+ActiveRecord::Schema.define(version: 20130802111140) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,16 @@ ActiveRecord::Schema.define(version: 20130801193823) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "characters_radicals", force: true do |t|
+    t.integer  "character_id"
+    t.integer  "radical_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "characters_radicals", ["character_id"], name: "index_characters_radicals_on_character_id", using: :btree
+  add_index "characters_radicals", ["radical_id"], name: "index_characters_radicals_on_radical_id", using: :btree
 
   create_table "radicals", force: true do |t|
     t.integer  "position"

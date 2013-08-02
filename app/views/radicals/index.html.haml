@@ -1,31 +1,36 @@
-%p
+%p.do-not-print
   At the moment, the order is based on 
   = link_to "this list", "http://www.hackingchinese.com/?p=2839"
-  of the 100 most common radicals.
-%p 
+  of the 100 most common radicals. Tested for printer friendliness on Chrome on a Mac, but if you want multiple columns, please help fixing 
+  = link_to "this bug", "https://code.google.com/p/chromium/issues/detail?id=99358"
+  = "."
+%p.do-not-print 
   Tip: use the 
   = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
   plugin for Google Chrome and hover over the radical for more info. 
 %table
-  %tr
+  %tr.do-not-print 
     %th Simplified
     %th Variants
     %th Pinyin
-    %th 
+    %th.do-not-print 
 
   - @radicals.each do |radical|
     %tr
-      %td.chinese= link_to radical.simplified, "http://en.wikipedia.org/wiki/Radical_#{ radical.position }"
+      %td.chinese
+        = link_to radical.simplified, "http://en.wikipedia.org/wiki/Radical_#{ radical.position }", :class => "do-not-print"
+        %span.print-only 
+          = radical.simplified
       %td.chinese
         = Radical.where(position: radical.position, variant: true).collect{|r|r.simplified}.join(", ")
       %td
         = PinYin.of_string(radical.simplified, :unicode).first
       - if can? :show, radical
-        %td= link_to "Show", radical
+        %td.do-not-print= link_to "Show", radical
 %br
-
-- if can? :create, Radical
-  = link_to 'New Radical', new_radical_path
-- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
-  :javascript
-    mixpanel.track("Radicals");
+.do-not-print
+  - if can? :create, Radical
+    = link_to 'New Radical', new_radical_path
+  - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+    :javascript
+      mixpanel.track("Radicals");
