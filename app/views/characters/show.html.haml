@@ -5,3 +5,17 @@
 %br
 %hr
 = link_to 'Edit', edit_character_path(@character)
+%hr
+%h3 Radicals
+%ul.radicals
+  - @character.radicals.each do |radical|
+    %li
+      = radical.simplified
+%form.simple_form
+  .form-inputs
+    .control-group.optional
+      %label.control-label
+        Add another radical
+      .controls
+        = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true)
+  %input.btn{:type => "submit", :value => "Add radical"}
