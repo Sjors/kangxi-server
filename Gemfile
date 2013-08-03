@@ -25,15 +25,14 @@ group :test do
   gem 'rspec-rails'
   gem 'terminal-notifier-guard' # Mac
   gem "factory_girl_rails"
-  
+  gem "capybara"
+  gem 'poltergeist'
+  gem 'phantomjs', :require => 'phantomjs/poltergeist'
 end
 
 group :development do
   gem 'better_errors'
   gem 'binding_of_caller', :platforms=>[:mri_19, :rbx]
-  gem "capybara"
-  gem 'poltergeist'
-  gem 'phantomjs', :require => 'phantomjs/poltergeist'
   gem 'html2haml'
   gem 'quiet_assets'
   gem 'rb-fchange', :require=>false

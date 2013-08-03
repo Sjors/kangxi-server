@@ -60,6 +60,20 @@ describe "Character" do
       end
     end
     
+    it "can be selected by tapping on a radical in the list", :js => true do
+      visit character_path(character)
+      select('夂', :from => 'radical')
+      
+      find_field("radical").value.to_i.should eq(Radical.where(position: 34).first.id)
+      # When :js => false, use this:
+      # find_field('radical').find('option[selected]').text.should eq("夂")
+      within ".form-inputs" do
+        click_link "一"
+      end
+      find_field("radical").value.to_i.should eq(Radical.where(position: 1).first.id)
+      
+    end
+    
     # it "can be removed" do
     # end
   end

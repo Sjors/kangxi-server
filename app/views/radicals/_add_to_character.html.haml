@@ -1,8 +1,11 @@
+%h4
+  Add another radical
 = form_tag(add_radical_character_path(character), :class => "simple_form") do
   .form-inputs
     .control-group.optional
-      %label.control-label
-        Add another radical
+      %label.control-label.chinese
+        - Radical.all.each do |radical|
+          = link_to radical.simplified, "", :onclick => "$('#radical').val('#{ radical.id }'); return false;"
       .controls
         = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese")
   %input.btn{:type => "submit", :value => "Add Radical"}
