@@ -3,9 +3,17 @@
 = form_tag(add_radical_character_path(character), :class => "simple_form") do
   .form-inputs
     .control-group.optional
-      %label.control-label.chinese
-        - Radical.all.each do |radical|
-          = link_to radical.simplified, "", :onclick => "$('#radical').val('#{ radical.id }'); return false;"
+      %label.control-label#radical-grid
+        - [[1,43], [44, 77], [78, 108], [109, 137]].each do |set|
+          %ul
+            - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
+              %li.chinese
+                = link_to radical.simplified, "", :onclick => "$('#radical').val('#{ radical.id }'); return false;"
+          - if set == [109, 137]
+            %br
+            %br
+            %h1.chinese{align: "right"}
+              = @character.simplified
       .controls
         = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese")
   %input.btn{:type => "submit", :value => "Add Radical"}

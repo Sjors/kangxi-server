@@ -1,3 +1,18 @@
 // Place all the styles related to the Radicals controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+#radical-grid {
+  column-count: 4; 
+  -moz-column-count:4; /* Firefox */
+  -webkit-column-count:4; /* Safari and Chrome */
+  
+  ul {
+    list-style-type: none;
+    -webkit-column-break-inside: avoid;
+  }
+  
+  li + li {
+    margin-top: 0.3em;
+  }
+}
