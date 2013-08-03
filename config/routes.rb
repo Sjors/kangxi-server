@@ -1,7 +1,11 @@
 ChineseCharacterLookup::Application.routes.draw do
   resources :radicals
 
-  resources :characters
+  resources :characters do
+    member do 
+      post :add_radical
+    end
+  end
   
   root :to => 'visitors#new'
   

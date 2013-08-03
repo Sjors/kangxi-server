@@ -1,6 +1,6 @@
 class CharactersController < ApplicationController
   load_and_authorize_resource
-  before_action :set_character, only: [:show, :edit, :update, :destroy]
+  before_action :set_character, only: [:show, :edit, :update, :destroy, :add_radical, :remove_radical]
 
   # GET /characters
   # GET /characters.json
@@ -60,6 +60,25 @@ class CharactersController < ApplicationController
       format.html { redirect_to characters_url }
       format.json { head :no_content }
     end
+  end
+  
+  def add_radical
+    respond_to do |format|
+      @radical = Radical.find(params[:radical])
+      
+      unless @radical.present?
+        format.html { redirect_to @character, error: 'No radical found to add to character.' }
+      end
+      
+      if @character.radicals << @radical
+        format.html { redirect_to @character, notice: "#{ @radical.simplified } succesfully added." }
+      else
+        format.html { redirect_to @character, error: "Unable to add #{ @radical.simplified  }."  }
+      end
+    end
+  end
+  
+  def remove_radical
   end
 
   private
