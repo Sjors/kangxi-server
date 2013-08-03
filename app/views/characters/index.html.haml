@@ -1,5 +1,3 @@
-%h1 Listing characters
-
 %p 
   Tip: use the 
   = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
@@ -9,13 +7,15 @@
   %tr
     %th 
     %th
-    %th
+    %th Radicals
 
   - @characters.each do |character|
     %tr
       %td.chinese= link_to character.simplified, character
       %td= link_to PinYin.of_string(character.simplified, :unicode).first, "http://en.wiktionary.org/wiki/#{character.simplified}#Mandarin", :target => "_blank"
-
+      %td.chinese
+        - character.radicals.each do |radical| 
+          = render "radicals/linked", :radical => radical
 %br
 
 = link_to 'New Character', new_character_path

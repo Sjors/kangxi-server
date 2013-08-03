@@ -1,20 +1,20 @@
 require 'spec_helper'
 include Helpers
 
-describe "Characters" do
+describe "Character" do
   let(:admin) { FactoryGirl.create(:admin) }
   
-  it "goes to list of characters from main screen when admin is logged in" do
-    FactoryGirl.create(:character, :simplified => "人")
-    login(admin)
+  describe "list" do
+    it "is the first thing an anymous user sees" do
+      FactoryGirl.create(:character, :simplified => "人")
+      login(admin)
     
-    visit "/"
-    click_link "Characters"
-    page.should have_content "人"
-  end
-  
-  describe "Add character" do
-    it "adds a character and allows another to be added" do
+      visit "/"
+      click_link "Characters"
+      page.should have_content "人"
+    end
+    
+    it "can be added sequentially" do
       login(admin)
       
       
@@ -26,5 +26,28 @@ describe "Characters" do
       
       page.should have_content("Simplified")
     end
+  end
+
+  
+  describe "radicals" do
+    let(:admin) { FactoryGirl.create(:admin) }
+    let(:character) { FactoryGirl.create(:character, :simplified => "爱") }
+    let(:radical) { FactoryGirl.create(:radical, :simplified => "夂") }
+    
+    before do
+      character.radicals << radical
+      login(admin)
+    end
+    
+    it "are shown on the character page" do
+      visit character_path(character)
+      page.should have_content(radical.simplified)
+    end
+    
+    it "can be added" do
+    end
+    
+    # it "can be removed" do
+    # end
   end
 end

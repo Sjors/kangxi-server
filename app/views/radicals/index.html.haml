@@ -18,9 +18,7 @@
   - @radicals.each do |radical|
     %tr
       %td.chinese
-        = link_to radical.simplified, "http://en.wikipedia.org/wiki/Radical_#{ radical.position }", :class => "do-not-print"
-        %span.print-only 
-          = radical.simplified
+        = render "radicals/linked", :radical => radical
       %td.chinese
         = Radical.where(position: radical.position, variant: true).collect{|r|r.simplified}.join(", ")
       %td

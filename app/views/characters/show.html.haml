@@ -17,5 +17,5 @@
       %label.control-label
         Add another radical
       .controls
-        = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true)
+        = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese")
   %input.btn{:type => "submit", :value => "Add radical"}
