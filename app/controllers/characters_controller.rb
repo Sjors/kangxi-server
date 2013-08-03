@@ -86,7 +86,7 @@ class CharactersController < ApplicationController
         format.html { redirect_to @character, error: 'No radical found to remove from character.' }
       end
       
-      if @character.radicals.delete(@radical)
+      if @character.remove_radical(@radical)
         format.html { redirect_to @character, notice: "#{ @radical.simplified } succesfully removed." }
       else
         format.html { redirect_to @character, error: "Unable to remove #{ @radical.simplified  }."  }
