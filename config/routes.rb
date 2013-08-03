@@ -4,6 +4,7 @@ ChineseCharacterLookup::Application.routes.draw do
   resources :characters do
     member do 
       post :add_radical
+      delete :remove_radical
     end
   end
   

@@ -79,6 +79,19 @@ class CharactersController < ApplicationController
   end
   
   def remove_radical
+    respond_to do |format|
+      @radical = Radical.find(params[:radical])
+      
+      unless @radical.present?
+        format.html { redirect_to @character, error: 'No radical found to remove from character.' }
+      end
+      
+      if @character.radicals.delete(@radical)
+        format.html { redirect_to @character, notice: "#{ @radical.simplified } succesfully removed." }
+      else
+        format.html { redirect_to @character, error: "Unable to remove #{ @radical.simplified  }."  }
+      end
+    end
   end
 
   private

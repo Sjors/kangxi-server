@@ -29,7 +29,7 @@ describe "Character" do
   end
 
   
-  describe "radicals" do
+  describe "radical" do
     let(:admin) { FactoryGirl.create(:admin) }
     let(:character) { FactoryGirl.create(:character, :simplified => "爱") }
     let(:radical) { FactoryGirl.create(:radical, :simplified => "夂", :position => 34) }
@@ -41,7 +41,7 @@ describe "Character" do
       login(admin)
     end
     
-    it "are shown on the character page" do
+    it "list is shown on the character page" do
       visit character_path(character)
       within "ul.radicals" do
         page.should have_content(radical.simplified)
@@ -74,7 +74,15 @@ describe "Character" do
       
     end
     
-    # it "can be removed" do
-    # end
+    it "can be removed" do
+      visit character_path(character)
+      within "ul.radicals" do
+        page.should have_content('夂')
+        click_link ""
+      end
+      within "ul.radicals" do
+        page.should_not have_content('夂')
+      end
+    end
   end
 end
