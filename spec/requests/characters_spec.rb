@@ -32,19 +32,32 @@ describe "Character" do
   describe "radicals" do
     let(:admin) { FactoryGirl.create(:admin) }
     let(:character) { FactoryGirl.create(:character, :simplified => "爱") }
-    let(:radical) { FactoryGirl.create(:radical, :simplified => "夂") }
+    let(:radical) { FactoryGirl.create(:radical, :simplified => "夂", :position => 34) }
+    
     
     before do
+      FactoryGirl.create(:radical, :simplified => "一", :position => 1)
       character.radicals << radical
       login(admin)
     end
     
     it "are shown on the character page" do
       visit character_path(character)
-      page.should have_content(radical.simplified)
+      within "ul.radicals" do
+        page.should have_content(radical.simplified)
+      end
     end
     
     it "can be added" do
+      visit character_path(character)
+      within "ul.radicals" do
+        page.should_not have_content('一')
+      end
+      select('一', :from => 'radical')
+      click_button "Add Radical"
+      within "ul.radicals" do
+        page.should have_content('一')
+      end
     end
     
     # it "can be removed" do
