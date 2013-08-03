@@ -32,11 +32,11 @@ describe "Character" do
   describe "radical" do
     let(:admin) { FactoryGirl.create(:admin) }
     let(:character) { FactoryGirl.create(:character, :simplified => "爱") }
-    let(:radical) { FactoryGirl.create(:radical, :simplified => "夂", :position => 34) }
+    let(:radical) { FactoryGirl.create(:radical, :simplified => "夂", :position => 34, :variant => false) }
     
     
     before do
-      FactoryGirl.create(:radical, :simplified => "一", :position => 1)
+      FactoryGirl.create(:radical, :simplified => "一", :position => 1, :variant => false)
       character.radicals << radical
       login(admin)
     end
