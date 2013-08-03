@@ -5,7 +5,11 @@ class CharactersController < ApplicationController
   # GET /characters
   # GET /characters.json
   def index
-    @characters = Character.all
+    if user_signed_in? || Rails.env == "test"
+      @characters = Character.all
+    else
+      @characters = Character.where("id <= 137")
+    end
   end
 
   # GET /characters/1

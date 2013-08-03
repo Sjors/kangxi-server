@@ -4,14 +4,14 @@
   .form-inputs
     .control-group.optional
       %label.control-label#radical-grid
-        - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, 137]]).each do |set|
+        - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, Radical.last.id]]).each do |set|
           %ul
             - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
               %li.chinese
                 = link_to radical.simplified, "", :onclick => "$('#radical').val('#{ radical.id }'); return false;"
                 - Radical.where(position: radical.position, variant: true).each do |variant|
                   = link_to variant.simplified, "", :onclick => "$('#radical').val('#{ variant.id }'); return false;"
-          - if set == [109, 137]
+          - if set.first == 109
             %br
             %br
             %h1.chinese{align: "right"}
