@@ -8,7 +8,7 @@
           %ul
             - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
               %li.chinese
-                = link_to radical.simplified, "", :onclick => "$('#radical').val('#{ radical.id }'); return false;"
+                = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
                 - Radical.where(position: radical.position, variant: true).each do |variant|
                   = link_to variant.simplified, "", :onclick => "$('#radical').val('#{ variant.id }'); return false;"
           - if set.first == 109
