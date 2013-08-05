@@ -2,7 +2,8 @@
   - radicals.each do |radical|
     %li
       %span.chinese
-        = radical.simplified
-      %a.btn.btn-mini.btn-danger{:href => remove_radical_character_path(@character) + "?radical=#{ radical.id }", :title => "Unlink", :'data-method' => :delete, :'data-confirm' => "Are you sure?"}
-        %i{:class=>"icon-trash"}
+        = link_to radical.simplified, radical
+      - if can? :destroy, @character
+        %a.btn.btn-mini.btn-danger{:href => remove_radical_character_path(@character) + "?radical=#{ radical.id }", :title => "Unlink", :'data-method' => :delete, :'data-confirm' => "Are you sure?"}
+          %i{:class=>"icon-trash"}
       

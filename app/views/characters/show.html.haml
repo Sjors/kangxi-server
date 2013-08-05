@@ -1,11 +1,17 @@
 %h1.chinese
   = @character.simplified
 %br
-= link_to PinYin.of_string(@character.simplified, :unicode).first, "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin"
-%br
+= PinYin.of_string(@character.simplified, :unicode).first 
+= ("(" + link_to("Wiktionary",  "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin", :target => "_blank") + ")").html_safe
+
 %hr
-= link_to 'Edit', edit_character_path(@character)
+- if can? :edit, @character
+  = link_to 'Edit', edit_character_path(@character)
 %hr
 %h3 Radicals
 = render "radicals/list", :radicals => @character.radicals
-= render "radicals/add_to_character", :character => @character
+- if can? :edit, @character
+  = render "radicals/add_to_character", :character => @character
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Character", {"character": "#{@character.simplified}"});

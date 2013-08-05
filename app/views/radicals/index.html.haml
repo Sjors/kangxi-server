@@ -13,18 +13,19 @@
     %th Simplified
     %th Variants
     %th Pinyin
-    %th.do-not-print 
+    %th.do-not-print Wiktionary
 
   - @radicals.each do |radical|
     %tr
       %td.chinese
         = render "radicals/linked", :radical => radical
       %td.chinese
-        = Radical.where(position: radical.position, variant: true).collect{|r|r.simplified}.join(", ")
+        - Radical.where(position: radical.position, variant: true).each do |r|
+          = render "radicals/linked", :radical => r
       %td
         = PinYin.of_string(radical.simplified, :unicode).first
       - if can? :show, radical
-        %td.do-not-print= link_to "Show", radical
+        %td.do-not-print= link_to "Info", "http://en.wikipedia.org/wiki/Radical_#{ radical.position }"
 %br
 .do-not-print
   - if can? :create, Radical

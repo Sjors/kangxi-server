@@ -1,17 +1,30 @@
-%p#notice= notice
-
-%p
-  %b Position:
-  = @radical.position
-%p
-  %b Simplified:
+%h1.chinese
   = @radical.simplified
+%br
 %p
-  %b Variant:
-  = @radical.variant
+  %b 
+    Kangxi Radical
+    = @radical.position
+  = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }", :target => "_blank") + ")").html_safe
+  
+- if @radical.variant
+  %p
+    %b 
+      Variant of
+      - original = Radical.where(position: @radical.position, variant: false).first
+      = link_to original.simplified, original
+     
 
-= link_to 'Edit', edit_radical_path(@radical)
-\|
-= link_to 'Destroy', radical_path(@radical), :method => :delete, :confirm => "Are you sure?"
-\|
-= link_to 'Back', radicals_path
+
+%hr
+%h3 Characters
+= render "characters/list", :characters => @radical.characters.uniq
+
+- if can? :edit, @radical
+  = link_to 'Edit', edit_radical_path(@radical)
+  \|
+  = link_to 'Destroy', radical_path(@radical), :method => :delete, :confirm => "Are you sure?"
+
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Radical", {"radical": "#{@radical.simplified}"});

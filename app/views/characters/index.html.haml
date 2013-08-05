@@ -5,17 +5,25 @@
 
 %table
   %tr
-    %th 
-    %th
+    %th Character
+    %th Pinyin 
+    %th Wiktionary
     %th Radicals
 
   - @characters.each do |character|
     %tr
-      %td.chinese= link_to character.simplified, character
-      %td= link_to PinYin.of_string(character.simplified, :unicode).first, "http://en.wiktionary.org/wiki/#{character.simplified}#Mandarin", :target => "_blank"
+      %td.chinese
+        = link_to character.simplified, character
+      %td= link_to PinYin.of_string(character.simplified, :unicode).first, character
+      %td= link_to "Info", "http://en.wiktionary.org/wiki/#{character.simplified}#Mandarin", :target => "_blank"
       %td.chinese
         - character.radicals.each do |radical| 
           = render "radicals/linked", :radical => radical
 %br
 
-= link_to 'New Character', new_character_path
+- if can? :new, Character
+  = link_to 'New Character', new_character_path
+
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Characters");

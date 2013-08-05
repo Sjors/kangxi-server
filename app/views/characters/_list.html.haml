@@ -1,0 +1,5 @@
+%ul.characters
+  - characters.each do |character|
+    %li
+      %span.chinese
+        = link_to character.simplified, character
