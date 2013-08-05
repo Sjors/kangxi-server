@@ -10,7 +10,7 @@
               %li.chinese
                 = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
                 - Radical.where(position: radical.position, variant: true).each do |variant|
-                  = link_to variant.simplified, "", :onclick => "$('#radical').val('#{ variant.id }'); return false;"
+                  = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
           - if set.first == 1
             %br
             %br

@@ -7,14 +7,20 @@
     = @radical.position
   = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }", :target => "_blank") + ")").html_safe
   
-- if @radical.variant
-  %p
-    %b 
+%p
+  %b 
+    - if @radical.variant
       Variant of
       - original = Radical.where(position: @radical.position, variant: false).first
-      = link_to original.simplified, original
-     
-
+      %span.chinese
+        = link_to original.simplified, original
+    - else 
+      - variants = Radical.where(position: @radical.position, variant: true)
+      - unless variants.count == 0
+        Variants: 
+        %span.chinese
+          - variants.each do |variant|
+            = link_to variant.simplified, variant
 
 %hr
 %h3 Characters
