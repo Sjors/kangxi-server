@@ -5,7 +5,9 @@
   %b 
     Kangxi Radical
     = @radical.position
-  = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }", :target => "_blank") + ")").html_safe
+  = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }") + ")").html_safe
+  %br
+  = PinYin.of_string(@radical.simplified, :unicode).first 
   
 %p
   %b 

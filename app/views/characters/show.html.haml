@@ -2,7 +2,7 @@
   = @character.simplified
 %br
 = PinYin.of_string(@character.simplified, :unicode).first 
-= ("(" + link_to("Wiktionary",  "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin", :target => "_blank") + ")").html_safe
+= ("(" + link_to("Wiktionary",  "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin") + ")").html_safe
 
 %hr
 - if can? :edit, @character
