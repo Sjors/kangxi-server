@@ -8,7 +8,7 @@ class CharactersController < ApplicationController
     if user_signed_in? || Rails.env == "test"
       @characters = Character.all
     else
-      @characters = Character.where("id <= 137")
+      @characters = Character.includes(:radicals).where("radicals.id IS NOT NULL")
     end
   end
 

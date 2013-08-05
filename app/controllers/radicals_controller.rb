@@ -5,7 +5,11 @@ class RadicalsController < ApplicationController
   # GET /radicals
   # GET /radicals.json
   def index
-    @radicals = Radical.where(variant: false)
+    if user_signed_in? || Rails.env == "test"
+      @radicals = Radical.where(variant: false)
+    else
+      @radicals = Radical.where(variant: false).where("id <= 137")
+    end
   end
 
   # GET /radicals/1
