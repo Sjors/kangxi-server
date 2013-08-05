@@ -3,4 +3,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-ChineseCharacterLookup::Application.load_tasks
+KangxiRadicals::Application.load_tasks

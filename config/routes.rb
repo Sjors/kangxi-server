@@ -1,4 +1,4 @@
-ChineseCharacterLookup::Application.routes.draw do
+KangxiRadicals::Application.routes.draw do
   resources :radicals
 
   resources :characters do

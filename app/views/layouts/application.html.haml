@@ -2,7 +2,7 @@
 %html
   %head
     %meta{:content => "width=device-width, initial-scale=1.0", :name => "viewport"}
-      %title= content_for?(:title) ? yield(:title) : "Chinese Character Lookup"
+      %title= content_for?(:title) ? yield(:title) : "KangXi Radicals"
       %meta{:content => content_for?(:description) ? yield(:description) : "Chinese Character Lookup", :name => "description"}
         = stylesheet_link_tag "application", :media => "screen, projection"
         = stylesheet_link_tag "application-print", :media => "print"
