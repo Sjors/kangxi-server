@@ -10,6 +10,8 @@
 %hr
 %h3 Radicals
 = render "radicals/list", :radicals => @character.radicals
+- unless user_signed_in?
+  = render "rationale"
 - if can? :edit, @character
   = render "radicals/add_to_character", :character => @character
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
