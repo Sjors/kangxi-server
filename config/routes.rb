@@ -8,7 +8,9 @@ KangxiRadicals::Application.routes.draw do
     end
   end
   
-  root :to => 'visitors#new'
+  get 'lookup' => 'lookup#index'
+  
+  root :to => 'lookup#index'
   
   devise_for :users, :path_prefix => 'd' 
 end

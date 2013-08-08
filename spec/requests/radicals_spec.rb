@@ -4,9 +4,9 @@ include Helpers
 describe "Radicals" do
   let(:admin) { FactoryGirl.create(:admin) }
   
-  it "anonymous user goes to list of radicals from main screen" do
+  it "anonymous user can see the list of radicals" do
     FactoryGirl.create(:radical, :simplified => "人")
-    visit "/"
+    visit radicals_path
     page.should have_content "人"
   end
   

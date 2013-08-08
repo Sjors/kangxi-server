@@ -1,6 +1,5 @@
 %ul.nav
-  - if user_signed_in?
-    %li= link_to 'Home', root_path
+  %li= link_to 'Lookup', lookup_path
   - if can? :index, Character
     %li= link_to 'Characters', characters_path
   - if can? :index, Radical
