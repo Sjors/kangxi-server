@@ -1,8 +1,8 @@
-.page-header
-  Do you recognize any of the radicals below in the character which you are trying to identify?
-%table
+%table.lookup
   - @radicals.each_slice(4) do |row|
     %tr
       - row.each do |radical|
-        %td.chinese
+        %td.chinese-lookup
           = link_to radical.simplified, radical_lookup_path(radical)
+%p  
+  Do you recognize any of the radicals below in the character which you are trying to identify?

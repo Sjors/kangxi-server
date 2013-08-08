@@ -2,9 +2,9 @@
   %h3
     Characters containing the radical 
     = @radical.simplified
-%table
+%table.lookup
   - @characters.each_slice(4) do |row|
     %tr
       - row.each do |character|
-        %td.chinese
+        %td.chinese-lookup
           = link_to character.simplified, character

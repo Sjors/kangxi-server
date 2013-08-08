@@ -1,0 +1,22 @@
+.chinese-lookup {
+  font-family: Georgia, "Times New Roman", "KaiTi", "楷体", STKaiti, "华文楷体", serif;
+  
+  font-size: 40px; 
+  
+  a:visited {
+    color: black;
+  };
+  
+  @media (min-width: 768px) {
+    a:hover {
+      background-color: white;
+    }  
+  
+
+  }
+ 
+}
+
+table.lookup td {
+  border:solid 30px transparent;
+}
