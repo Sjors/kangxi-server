@@ -6,9 +6,9 @@ class CharactersController < ApplicationController
   # GET /characters.json
   def index
     if user_signed_in? || Rails.env == "test"
-      @characters = Character.all
+      @characters = Character.all.page(params[:page])
     else
-      @characters = Character.includes(:radicals).where("radicals.id IS NOT NULL")
+      @characters = Character.includes(:radicals).where("radicals.id IS NOT NULL").page(params[:page])
     end
   end
 

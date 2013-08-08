@@ -4,6 +4,7 @@
   = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
   plugin for Google Chrome to see meaning and hear the pronunciation.
 
+= will_paginate @characters
 %table
   %tr
     %th Character
@@ -20,7 +21,7 @@
       %td.chinese
         - character.radicals.each do |radical| 
           = render "radicals/linked", :radical => radical
-%br
+= will_paginate @characters
 
 - if can? :new, Character
   = link_to 'New Character', new_character_path

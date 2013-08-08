@@ -2,7 +2,14 @@ class Character < ActiveRecord::Base
   validates_uniqueness_of :simplified
   validates_length_of :simplified, :is => 1
   
+  validates_presence_of :level
+  validates :level, :inclusion => 1..6 
+  
   has_and_belongs_to_many :radicals
+  
+  self.per_page = 100
+  
+  default_scope -> { order(level: :asc, id: :asc) }
   
   def remove_radical(radical, count = 1)
     current_radical_count = self.radicals.where(id: radical.id).count
