@@ -8,3 +8,7 @@
       - row.each do |character|
         %td.chinese-lookup
           = link_to character.simplified, character
+          
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup", {"Radical 1": "#{@radical.simplified}"});

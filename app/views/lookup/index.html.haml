@@ -6,3 +6,7 @@
           = link_to radical.simplified, radical_lookup_path(radical)
 %p  
   Do you recognize any of the radicals below in the character which you are trying to identify?
+
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup");
