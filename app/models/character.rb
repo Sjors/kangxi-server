@@ -9,4 +9,8 @@ class Character < ActiveRecord::Base
     self.radicals.delete(radical)
     (current_radical_count - count).times { self.radicals << radical }
   end
+  
+  def self.unmatched_by_first_screen_ids
+    self.includes(:radicals).where("radicals.first_screen = ?", true).references(:radicals).uniq.collect{|c| c.id}
+  end
 end

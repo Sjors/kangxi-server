@@ -1,0 +1,10 @@
+.page-header
+  %h3
+    Characters containing the radical 
+    = @radical.simplified
+%table
+  - @characters.each_slice(4) do |row|
+    %tr
+      - row.each do |character|
+        %td.chinese
+          = link_to character.simplified, character
