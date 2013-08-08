@@ -1,7 +1,8 @@
 .page-header
   %h3
-    Characters containing the radical 
     = @radical.simplified
+    characters
+
 %table.lookup
   - @characters.each_slice(4) do |row|
     %tr
