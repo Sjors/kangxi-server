@@ -11,4 +11,8 @@ class Radical < ActiveRecord::Base
   def currently_unmatched_characters 
     self.characters.where("characters.id not in (?)", Character.unmatched_by_first_screen_ids ).references(:character)
   end
+  
+  def pinyin
+    PinYin.of_string(self.simplified, :unicode).first
+  end
 end

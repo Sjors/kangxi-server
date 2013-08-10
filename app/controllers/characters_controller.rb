@@ -15,6 +15,7 @@ class CharactersController < ApplicationController
   # GET /characters/1
   # GET /characters/1.json
   def show
+    @radicals = Radical.where(variant: false).order(position: :asc)
   end
 
   # GET /characters/new

@@ -20,4 +20,8 @@ class Character < ActiveRecord::Base
   def self.unmatched_by_first_screen_ids
     self.includes(:radicals).where("radicals.first_screen = ?", true).references(:radicals).uniq.collect{|c| c.id}
   end
+  
+  def pinyin
+    PinYin.of_string(self.simplified, :unicode).first
+  end
 end

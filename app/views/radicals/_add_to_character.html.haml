@@ -1,23 +1,23 @@
-%h4
-  Add another radical
-= form_tag(add_radical_character_path(character), :class => "simple_form") do
-  .form-inputs
-    .control-group.optional
-      %label.control-label#radical-grid
-        - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, 136], [137, Radical.last.id]]).each do |set|
-          %ul
-            - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
-              %li.chinese
-                = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
-                - Radical.where(position: radical.position, variant: true).each do |variant|
-                  = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
-            - if set.first == 1
-              %li
-                %h1.chinese{align: "left"}
-                  = @character.simplified
-      %br
-      %br
-      %br
-      .controls
-        = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese selectpicker span2")
+= form_tag(add_radical_character_path(character), :class => "form-inline") do
+  %ul.inline
+    %li
+      = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese selectpicker span2")
       %input.btn{:type => "submit", :value => "Add Radical"}
+    %li
+      %h1.chinese
+        = @character.simplified
+#radical-grid
+  / - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, 136], [137, Radical.last.id]]).each do |set|
+  - @radicals.each_slice(22) do |set|
+    %ul
+      / - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
+      - set.each do |radical|
+        %li
+          %span.chinese
+            = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
+            - Radical.where(position: radical.position, variant: true).each do |variant|
+              = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
+          %span.pinyin-small
+            = radical.pinyin
+      / - if set.first == 1
+      /   %li

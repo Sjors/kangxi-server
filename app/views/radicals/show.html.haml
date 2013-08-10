@@ -7,7 +7,7 @@
     = @radical.position
   = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }") + ")").html_safe
   %br
-  = PinYin.of_string(@radical.simplified, :unicode).first 
+  = @radical.pinyin
   
 %p
   %b 

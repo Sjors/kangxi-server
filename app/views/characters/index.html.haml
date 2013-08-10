@@ -16,7 +16,7 @@
     %tr
       %td.chinese
         = link_to character.simplified, character
-      %td= link_to PinYin.of_string(character.simplified, :unicode).first, character
+      %td= link_to character.pinyin, character
       %td= link_to "Info", "http://en.wiktionary.org/wiki/#{character.simplified}#Mandarin", :target => "_blank"
       %td.chinese
         - character.radicals.each do |radical| 

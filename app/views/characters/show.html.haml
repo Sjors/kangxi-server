@@ -1,7 +1,7 @@
 %h1.chinese
   = @character.simplified
 %br
-= PinYin.of_string(@character.simplified, :unicode).first 
+= @character.pinyin
 = ("(" + link_to("Wiktionary",  "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin") + ")").html_safe
 
 %hr
