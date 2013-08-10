@@ -4,21 +4,20 @@
   .form-inputs
     .control-group.optional
       %label.control-label#radical-grid
-        - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, Radical.last.id]]).each do |set|
+        - (Rails.env == "test" ? [[1, Radical.last.id]] : [[1,43], [44, 77], [78, 108], [109, 136], [137, Radical.last.id]]).each do |set|
           %ul
             - Radical.where(variant: false).where("id >= ?", set.first).where("id <= ?", set.last).each do |radical|
               %li.chinese
                 = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
                 - Radical.where(position: radical.position, variant: true).each do |variant|
                   = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
-          - if set.first == 1
-            %br
-            %br
-            %h1.chinese{align: "left"}
-              = @character.simplified
-            %br
-            %br
-            %br
-            .controls
-              = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese selectpicker span2")
-            %input.btn{:type => "submit", :value => "Add Radical"}
+      %br
+      %br
+      %h1.chinese{align: "left"}
+        = @character.simplified
+      %br
+      %br
+      %br
+      .controls
+        = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese selectpicker span2")
+      %input.btn{:type => "submit", :value => "Add Radical"}
