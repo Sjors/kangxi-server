@@ -24,6 +24,9 @@
           - variants.each do |variant|
             = link_to variant.simplified, variant
 
+%br
+= @radical.note
+
 %hr
 %h3 Characters
 = render "characters/list", :characters => @radical.characters.uniq

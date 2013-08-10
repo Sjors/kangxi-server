@@ -71,6 +71,6 @@ class RadicalsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def radical_params
-      params.require(:radical).permit(:position, :simplified, :variant)
+      params.require(:radical).permit(:position, :simplified, :variant, :note)
     end
 end
