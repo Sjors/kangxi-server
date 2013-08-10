@@ -5,11 +5,8 @@ class RadicalsController < ApplicationController
   # GET /radicals
   # GET /radicals.json
   def index
-    if user_signed_in? || Rails.env == "test"
-      @radicals = Radical.where(variant: false)
-    else
-      @radicals = Radical.where(variant: false).where("id <= 137")
-    end
+    @radicals = Radical.joins(:characters).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+    @current_character_count = Character.includes(:radicals).where("radicals.id IS NOT NULL").count
   end
 
   # GET /radicals/1

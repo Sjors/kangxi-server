@@ -1,19 +1,13 @@
 %p.do-not-print
-  At the moment, the order is based on 
-  = link_to "this list", "http://www.hackingchinese.com/?p=2839"
-  of the 100 most common radicals. Tested for printer friendliness on Chrome on a Mac, but if you want multiple columns, please help fixing 
-  = link_to "this bug", "https://code.google.com/p/chromium/issues/detail?id=99358"
-  = "."
-%p.do-not-print 
-  Tip: use the 
-  = link_to "EZPreview", "https://chrome.google.com/webstore/detail/ezlinkpreview/nnkcfbiefgdaceeplickkkmifpicbpcc?hl=en"
-  plugin for Google Chrome and hover over the radical for more info. 
+  These are the most common radicals in order of how often they occur anywhere within
+  = link_to "this list", characters_path
+  of characters.
 %table.characters
   %tr.do-not-print 
     %th Simplified
-    %th Variants
     %th Pinyin
     %th.do-not-print Wiktionary
+    %th.do-not-print Frequency
 
   - @radicals.each do |radical|
     %tr
@@ -24,18 +18,22 @@
           = radical.currently_unmatched_characters.count
           \/
           = radical.characters.count
-      %td
-        - Radical.where(position: radical.position, variant: true).each do |r|
-          %span.chinese
-            = render "radicals/linked", :radical => radical
-          - if can? :index_characters, Radical
-            = radical.currently_unmatched_characters.count
-            \/
-            = radical.characters.count
+      / %td
+      /   - Radical.where(position: radical.position, variant: true).each do |r|
+      /     %span.chinese
+      /       = render "radicals/linked", :radical => radical
+      /     - if can? :index_characters, Radical
+      /       = radical.currently_unmatched_characters.count
+      /       \/
+      /       = radical.characters.count
       %td
         = PinYin.of_string(radical.simplified, :unicode).first
       - if can? :show, radical
         %td.do-not-print= link_to "Info", "http://en.wikipedia.org/wiki/Radical_#{ radical.position }"
+      %td.do-not-print
+        = succeed '%' do
+          = (radical.characters.count.to_f / @current_character_count.to_f * 100.0).round
+        
       
 %br
 .do-not-print

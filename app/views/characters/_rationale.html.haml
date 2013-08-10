@@ -1,4 +1,7 @@
 %p 
   Each Chinese character can be deconstructed into 
-  = link_to("radicals", "http://en.wikipedia.org/wiki/Kangxi_radical") + "." 
-  Normal dictionaries only use one radical for each character. This made sense a few centuries ago, but I want to take it one step further by breaking each character down into multiple radicals. This will make it easier to identify a character if you see one in the real world.
+  = succeed '.' do
+    = link_to("radicals", "http://en.wikipedia.org/wiki/Kangxi_radical")
+  Normal dictionaries only use one radical for each character, but I broke each character down into multiple radicals. This makes it easier to 
+  = link_to "identify characters", lookup_path
+  that you encounter in the real world.

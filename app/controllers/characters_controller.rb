@@ -8,7 +8,7 @@ class CharactersController < ApplicationController
     if user_signed_in? || Rails.env == "test"
       @characters = Character.all.page(params[:page])
     else
-      @characters = Character.includes(:radicals).where("radicals.id IS NOT NULL").page(params[:page])
+      @characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").page(params[:page])
     end
   end
 

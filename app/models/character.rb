@@ -9,7 +9,7 @@ class Character < ActiveRecord::Base
   
   self.per_page = 100
   
-  default_scope -> { order(level: :asc, id: :asc) }
+  default_scope -> { order("level asc, characters.id asc") }
   
   def remove_radical(radical, count = 1)
     current_radical_count = self.radicals.where(id: radical.id).count
