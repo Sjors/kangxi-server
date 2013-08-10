@@ -16,6 +16,9 @@
             %br
             %h1.chinese{align: "left"}
               = @character.simplified
+            %br
+            %br
+            %br
             .controls
-              = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese")
+              = select_tag("radical", options_from_collection_for_select(Radical.all, "id", "simplified") ,:include_blank => true, :class => "chinese selectpicker span2")
             %input.btn{:type => "submit", :value => "Add Radical"}
