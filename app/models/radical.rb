@@ -13,6 +13,11 @@ class Radical < ActiveRecord::Base
   end
   
   def pinyin
-    PinYin.of_string(self.simplified, :unicode).first
+    if self.variant
+      simpl = Radical.where(variant: false, position: self.position).first.simplified
+    else
+      simpl = self.simplified
+    end
+    PinYin.of_string(simpl, :unicode).first
   end
 end
