@@ -23,7 +23,7 @@
           %span.chinese
             = render "radicals/linked", :radical => radical
           %span.pinyin-small
-            - if radical.pinyin == character.pinyin
+            - if character.radicals.count > 1 && radical.pinyin == character.pinyin
               %b
                 = link_to radical.pinyin, radical
             - else
