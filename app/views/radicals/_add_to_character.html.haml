@@ -11,10 +11,11 @@
                 = link_to radical.simplified, radical, :onclick => "$('#radical').val('#{ radical.id }'); return false;"
                 - Radical.where(position: radical.position, variant: true).each do |variant|
                   = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
-      %br
-      %br
-      %h1.chinese{align: "left"}
-        = @character.simplified
+          - if set.first == 1
+            %br
+            %br
+            %h1.chinese{align: "left"}
+              = @character.simplified
       %br
       %br
       %br
