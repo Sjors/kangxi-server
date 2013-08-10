@@ -18,6 +18,6 @@
             - Radical.where(position: radical.position, variant: true).each do |variant|
               = link_to variant.simplified, variant, :onclick => "$('#radical').val('#{ variant.id }'); return false;"
           %span.pinyin-small
-            = radical.pinyin
+            = link_to radical.pinyin, radical
       / - if set.first == 1
       /   %li
