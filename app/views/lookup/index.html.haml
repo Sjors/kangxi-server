@@ -5,7 +5,7 @@
         %td.chinese-lookup
           = link_to radical.simplified, radical_lookup_path(radical)
 %p  
-  Do you recognize any of the radicals below in the character which you are trying to identify?
+  Do you recognize any of the radicals above in the character which you are trying to identify? E.g. if you're looking for 脑, click on 月.
 
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
