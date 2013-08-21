@@ -39,6 +39,7 @@ group :development do
   gem 'rb-fsevent', :require=>false
   gem 'rb-inotify', :require=>false
   gem 'binding_of_caller'
+  gem 'pry'
 end
 
 group :production do

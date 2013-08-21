@@ -36,4 +36,5 @@ class Character < ActiveRecord::Base
   def has_radicals(first, second)
     self.radicals.to_a.subtract_once(first).include?(second)
   end
+  
 end
