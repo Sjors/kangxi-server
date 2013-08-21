@@ -54,7 +54,11 @@ class Radical < ActiveRecord::Base
   end
   
   def second_screen_characters
-    self.characters - self.first_screen_matches(false)
+    self.characters.to_a - self.first_screen_matches(false).to_a
+  end
+  
+  def no_screen_characters
+    self.characters.to_a - self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a
   end
   
   def self.first_screen_radicals
@@ -73,6 +77,10 @@ class Radical < ActiveRecord::Base
   
   def self.second_screen_frequent_for_characters(characters)
     Radical.where("radicals.first_screen = ? and ambiguous = ?", false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+  end
+  
+  def self.no_screen_frequent_for_characters(characters)
+    Radical.where("radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
   def self.second_screen_plus_one_radical_character_matches(warn)

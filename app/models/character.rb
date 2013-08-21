@@ -38,7 +38,9 @@ class Character < ActiveRecord::Base
   end
   
   def self.single_radicals
-    Radical.where("first_screen = ? OR second_screen = ?", true, true).collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }
+    # Radical.where("first_screen = ? OR second_screen = ?", true, true).collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }
+    
+    Radical.all.to_a.collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }.flatten.uniq
   end
   
 end

@@ -66,8 +66,8 @@ namespace :organize do
     matched_characters = Radical.first_screen_plus_one_radical_character_matches(false)
     puts "#{matched_characters.count} matched characters for first screen"
     
-    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
-    puts "#{unmatched_characters.count} unmatched characters"
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters.to_a - Character.single_radicals.to_a
+    puts "#{unmatched_characters.count} unmatched characters (excluding single radicals)"
         
     @radicals = Radical.second_screen_frequent_for_characters(unmatched_characters)
     puts "#{@radicals.to_a.count} non-first-screen radicals in those unmatched characters"
@@ -132,7 +132,7 @@ namespace :organize do
 
     puts "#{ matched_characters.count } characters can be found in 3 clicks"
         
-    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters.to_a - Character.single_radicals.to_a
     puts "#{unmatched_characters.count} unmatched characters."
   end
   
@@ -142,6 +142,26 @@ namespace :organize do
             
     matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
  
-    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters.to_a - Character.single_radicals.to_a
+  
+    puts "#{ matched_characters.count } characters can be found in 3 clicks"
+    puts "#{unmatched_characters.count} unmatched characters."
+  
+    @radicals = Radical.no_screen_frequent_for_characters(unmatched_characters)
+    puts "#{@radicals.to_a.count} non-first and non-second-screen radicals in those unmatched characters"
+          
+    @frequencies =  @radicals.collect{|r| [r, (r.no_screen_characters - matched_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
+          
+    @frequencies.each do |radical_frequency|
+      radical = radical_frequency[0]
+      frequency = radical_frequency[1]
+      if frequency > 0
+        puts "#{radical} #{ frequency }: #{ (radical.no_screen_characters - matched_characters - [Character.find_by(simplified: radical.simplified)]).join(' ') }"
+      end
+    end
+  
+  
+  
+ 
   end
 end
