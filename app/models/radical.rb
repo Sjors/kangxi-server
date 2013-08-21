@@ -27,11 +27,11 @@ class Radical < ActiveRecord::Base
   
   def first_screen_matches(warn)
     characters = []
-    Radical.where("id in (?)", self.radicals).each do |second_radical|
+    Radical.where("id in (?)", (self.first_screen ? self.radicals : [])).each do |second_radical|
       matches = self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
       characters << matches
       if matches.count > 20 && warn
-        puts "#{ first_radical } #{ second_radical } matches #{ matches.count } characters."
+        puts "#{ self } #{ second_radical } matches #{ matches.count } characters."
       end
     end
     
@@ -39,16 +39,16 @@ class Radical < ActiveRecord::Base
   end
   
   def second_screen_matches(warn)
-    characters = []
-    Radical.where("id in (?)", self.second_screen_radicals).each do |second_radical|
-      matches = self.characters.reject_if{|c| c.radicals.where("radicals.id in (?)", Radical.where(first_screen: true).collect{|r| r.id})}.keep_if{|character| character.has_radicals(self, second_radical)}
-      characters << matches
+    matching_characters = []
+    Radical.where("id in (?)", self.radicals).each do |second_radical|
+      matches = self.second_screen_characters.to_a.keep_if{|character| character.has_radicals(self, second_radical)}
+      matching_characters << matches
       if matches.count > 20 && warn
         puts "#{ first_radical } #{ second_radical } matches #{ matches.count } characters."
       end
     end
     
-    characters.flatten.uniq
+    matching_characters.flatten.uniq
   end
   
   def second_screen_characters
@@ -76,8 +76,8 @@ class Radical < ActiveRecord::Base
   def self.second_screen_plus_one_radical_character_matches(warn)
     characters = []
     
-    self.where(second_screen: true).each do |second_radical|
-      characters << second_radical.second_screen_matches(warn)
+    self.where(second_screen: true).each do |first_radical|
+      characters << first_radical.second_screen_matches(warn)
     end
     
     characters.flatten.uniq

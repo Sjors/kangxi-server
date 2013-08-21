@@ -1,9 +1,8 @@
 %table.lookup
-  - @radicals.each_slice(4) do |row|
-    %tr
-      - row.each do |radical|
-        %td.chinese-lookup
-          = link_to radical.simplified, first_radical_lookup_path(radical)
+  = render "index", :number => 1
+  %tr
+    %td{colspan: 4, align: "center"}
+      =link_to "None of these", more_radicals_path
 %p  
   Do you recognize any of the radicals above in the character which you are trying to identify? E.g. if you're looking for 
   %span.chinese 脑 

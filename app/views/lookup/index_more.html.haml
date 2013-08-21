@@ -1,0 +1,6 @@
+%table.lookup
+  = render "index", :number => 2
+
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup 2");

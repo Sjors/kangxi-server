@@ -72,8 +72,13 @@ namespace :organize do
           
     @frequencies.slice(0,20).each do |radical_frequency|
       radical = radical_frequency[0]
-      radical.update(second_screen: true, second_screen_frequency: radical_frequency[1])
-      puts "#{radical} #{ radical.second_screen_frequency }"
+      frequency = radical_frequency[1]
+      if frequency > 0
+        radical.update(second_screen: true, second_screen_frequency: frequency)
+        puts "#{radical} #{ radical.second_screen_frequency }"
+      elsif frequency == 1 && radical.to_s == r.second_screen_characters.first.to_s
+        puts "No composite characters left for #{ radical }"
+      end
     end
   end
 
@@ -85,7 +90,7 @@ namespace :organize do
       end
     
     
-      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous }
+      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || Radical.first_screen_radicals.include?(radical) }
        
       unless Rails.env == "production"
         puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unique second radicals that don't occur in the first screen"
@@ -115,14 +120,14 @@ namespace :organize do
   task :report => :environment do
     @characters = []
     
-    @characters << Radical.first_screen_plus_one_radical_character_matches(Rails.env == "production")
+    @characters << Radical.first_screen_plus_one_radical_character_matches(Rails.env != "production")
     
-    @characters << Radical.second_screen_plus_one_radical_character_matches(Rails.env == "production")
+    @characters << Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
     
     tally = @characters.flatten.uniq.count
     
     # Radical page has a link to Wikipedia, so also counts:
-    tally = tally + Radical.where("first_screen = ? || second_screen = ?", true, true).count
+    tally = tally + Radical.where("first_screen = ? OR second_screen = ?", true, true).count
     
     puts "#{ tally } characters can be found in 3 clicks"
   end
