@@ -128,20 +128,20 @@ namespace :organize do
     
     matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
         
-    tally = [matched_characters_1, matched_characters_2, Character.single_radicals].flatten.uniq.count
+    matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
 
-    puts "#{ tally } characters can be found in 3 clicks"
+    puts "#{ matched_characters.count } characters can be found in 3 clicks"
+        
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
+    puts "#{unmatched_characters.count} unmatched characters."
   end
   
   task :excluded => :environment do
     matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
     matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
             
-    matched_characters = [matched_characters_1, matched_characters_2, Character.single_radicals].flatten.uniq
-    
-    puts "#{matched_characters.count} matched characters."
-    
+    matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
+ 
     unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
-    puts "#{unmatched_characters.count} unmatched characters."
   end
 end
