@@ -21,17 +21,23 @@ namespace :organize do
   task :divide => :environment do 
     Radical.all.each do |first_radical|
       if first_radical.first_screen
-        radicals = first_radical.characters.collect{|character| character.radicals}.flatten.uniq.reject{|radical| radical == first_radical || radical.ambiguous}
+        radicals = []
+        first_radical.characters.each  do |character|
+          radicals << character.radicals.to_a.subtract_once(first_radical)
+        end
+        
+        
+        radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous }
      
         unless Rails.env == "production"
-          puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s
+          puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unqique second radicals"
           puts ""
         end
     
         frequencies = []
     
         radicals.each do |radical| 
-          frequency = first_radical.characters.keep_if{|character| character.radicals.include?(radical) }.count
+          frequency = first_radical.characters.keep_if{|character| character.has_radicals(first_radical, radical) }.count
           frequencies << [radical, frequency]
         end
     
@@ -54,7 +60,7 @@ namespace :organize do
     @characters = []
     Radical.where(first_screen: true).each do |first_radical|
       Radical.where("id in (?)", first_radical.radicals).each do |second_radical|
-        matches = first_radical.characters.keep_if{|c| c.radicals.include?(second_radical)}
+        matches = first_radical.characters.keep_if{|character| character.has_radicals(first_radical, second_radical)}
         @characters << matches
         if matches.count > 20
           unless Rails.env == "production"
@@ -64,6 +70,11 @@ namespace :organize do
       end
     end
     
-    puts "#{ @characters.uniq.count } characters can be found in 2 clicks"
+    tally = @characters.uniq.count
+    
+    # Radical page has a link to Wikipedia, so also counts:
+    tally = tally + Radical.where(first_screen:  true).count
+    
+    puts "#{ tally } characters can be found in 2 clicks"
   end
 end

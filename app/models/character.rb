@@ -32,4 +32,8 @@ class Character < ActiveRecord::Base
   def wiktionary_url
     "http://en.wiktionary.org/wiki/#{self.simplified}#Mandarin"
   end
+  
+  def has_radicals(first, second)
+    self.radicals.to_a.subtract_once(first).include?(second)
+  end
 end

@@ -6,6 +6,15 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
+require 'set'
+
+class Array
+  def subtract_once(*values)
+    values = Set.new values 
+    reject { |e| values.include?(e) && values.delete(e) }
+  end
+end
+
 module KangxiRadicals
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
