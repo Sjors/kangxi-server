@@ -64,7 +64,7 @@ namespace :organize do
     # binding.pry
     
     @radicals = Radical.second_screen_frequent_for_characters(unmatched_characters)
-    puts "#{@radicals.count} non-first-screen radicals in those unmatched characters"
+    puts "#{@radicals.to_a.count} non-first-screen radicals in those unmatched characters"
           
     @radicals.slice(0,20).each do |radical|
       puts radical
