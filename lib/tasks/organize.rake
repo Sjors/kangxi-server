@@ -10,8 +10,7 @@ namespace :organize do
   end
   
   task :first_screen => :environment do
-    # %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 冖 小 夕 勹 丨 丿 二 乛 卜)
-    @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 冖 小 夕 勹  二 卜 口 田 氵)
+    @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
     Radical.all.each do |radical|
       radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.characters.count)
     end
