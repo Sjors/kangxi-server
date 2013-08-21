@@ -26,6 +26,7 @@ namespace :organize do
         unless Rails.env == "production"
           puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s
           puts ""
+        end
     
         frequencies = []
     
@@ -40,6 +41,7 @@ namespace :organize do
           frequencies.each do |frequency|
             puts frequency[0].simplified + " " + frequency[1].to_s
           end
+        end
     
         first_radical.update radicals: frequencies.slice(0,19).collect{|f| f[0].id }
       else
@@ -52,7 +54,13 @@ namespace :organize do
     @characters = []
     Radical.where(first_screen: true).each do |first_radical|
       Radical.where("id in (?)", first_radical.radicals).each do |second_radical|
-        @characters << first_radical.characters.keep_if{|c| c.radicals.include?(second_radical)}
+        matches = first_radical.characters.keep_if{|c| c.radicals.include?(second_radical)}
+        @characters << matches
+        if matches.count > 20
+          unless Rails.env == "production"
+            puts "#{ first_radical } #{ second_radical } matches #{ matches.count } characters."
+          end
+        end
       end
     end
     
