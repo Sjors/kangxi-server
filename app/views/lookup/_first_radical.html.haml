@@ -1,0 +1,5 @@
+- @radicals.each_slice(4) do |row|
+  %tr
+    - row.each do |radical|
+      %td.chinese-lookup
+        = link_to radical.simplified, second_radical_lookup_path(@radical, radical)

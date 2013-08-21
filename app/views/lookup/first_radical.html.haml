@@ -3,11 +3,11 @@
   = link_to @radical.simplified, @radical
 
 %%table.lookup
-  - @radicals.each_slice(4) do |row|
+  = render "first_radical"
+  - if @radical.first_screen && @radical.secondary_radicals.count > 0
     %tr
-      - row.each do |radical|
-        %td.chinese-lookup
-          = link_to radical.simplified, second_radical_lookup_path(@radical, radical)
+      %td{colspan: 4, align: "center"}
+        =link_to "None of these", first_radical_lookup_more_path(@radical)
           
 %p  
   Select a second radical.

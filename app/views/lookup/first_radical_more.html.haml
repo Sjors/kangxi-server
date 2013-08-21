@@ -1,0 +1,14 @@
+%h4
+  Searching
+  = link_to @radical.simplified, @radical
+  alternative radicals
+
+%%table.lookup
+  = render "first_radical"
+          
+%p  
+  Select a second radical from these alternatives
+  
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}", "Alternatives": true});

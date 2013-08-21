@@ -14,6 +14,11 @@ class LookupController < ApplicationController
     @radicals = Radical.where("id in (?)", @radical.radicals)
   end
   
+  def first_radical_more
+    @radical = Radical.find(params[:id])
+    @radicals = Radical.where("id in (?)", @radical.secondary_radicals)
+  end
+  
   def second_radical
     @first_radical = Radical.find(params[:first_id])
     @second_radical = Radical.find(params[:second_id])

@@ -25,9 +25,10 @@ class Radical < ActiveRecord::Base
     self.simplified
   end
   
+  # This includes secondary matches
   def first_screen_matches(warn)
     characters = []
-    Radical.where("id in (?)", (self.first_screen ? self.radicals : [])).each do |second_radical|
+    Radical.where("id in (?)", (self.first_screen ? [self.radicals, self.secondary_radicals].flatten : [])).each do |second_radical|
       matches = self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
       characters << matches
       if matches.count > 20 && warn
@@ -38,6 +39,7 @@ class Radical < ActiveRecord::Base
     characters.flatten.uniq
   end
   
+  # Does not include secondary matches (because there aren't any)
   def second_screen_matches(warn)
     matching_characters = []
     Radical.where("id in (?)", self.radicals).each do |second_radical|
