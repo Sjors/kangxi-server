@@ -23,8 +23,9 @@ namespace :organize do
       if first_radical.first_screen
         radicals = first_radical.characters.collect{|character| character.radicals}.flatten.uniq.reject{|radical| radical == first_radical || radical.ambiguous}
      
-        puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s
-        puts ""
+        unless Rails.env == "production"
+          puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s
+          puts ""
     
         frequencies = []
     
@@ -35,9 +36,10 @@ namespace :organize do
     
         frequencies.sort_by!{|frequency| -frequency[1]}
     
-        frequencies.each do |frequency|
-          puts frequency[0].simplified + " " + frequency[1].to_s
-        end
+        unless Rails.env == "production"        
+          frequencies.each do |frequency|
+            puts frequency[0].simplified + " " + frequency[1].to_s
+          end
     
         first_radical.update radicals: frequencies.slice(0,19).collect{|f| f[0].id }
       else
