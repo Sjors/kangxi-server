@@ -27,7 +27,7 @@ class LookupController < ApplicationController
       @characters << @radical.characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
     end
     
-    @characters.flatten!.uniq!.slice!(0,35)
+    @characters.flatten!.uniq!.to_a.slice(0,35)
   end
   
   def second_radical

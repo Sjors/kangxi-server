@@ -1,0 +1,11 @@
+%h4
+  Searching
+  = link_to @radical.simplified, @radical
+  alternative characters
+
+%%table.lookup
+  = render "characters"
+  
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}", "Alternatives": 2});

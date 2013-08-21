@@ -1,0 +1,9 @@
+- @characters.each_slice(4) do |row|
+  %tr
+    - row.each do |character|
+      - if defined?(@first_radical) && @first_radical.simplified == "月" && @second_radical.simplified == "亠" && character.simplified == "脑"
+        %td.chinese-lookup{:style => "background-color: yellow;"}
+          = link_to character, character.wiktionary_url
+      - else
+        %td.chinese-lookup
+          = link_to character, character.wiktionary_url        

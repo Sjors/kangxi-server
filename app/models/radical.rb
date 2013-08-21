@@ -30,8 +30,8 @@ class Radical < ActiveRecord::Base
     characters = []
     Radical.where("id in (?)", (self.first_screen ? [self.radicals, self.secondary_radicals].flatten : [])).each do |second_radical|      
       matches = self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
-      characters << matches
-      if matches.count > 35 && warn # Won't fit on one screen, but that's alright for these few exceptions
+      characters << matches.to_a.slice(0,20)
+      if matches.count > 20 && warn 
         puts "#{ self } #{ second_radical } matches #{ matches.count } characters."
       end
     end
@@ -42,13 +42,14 @@ class Radical < ActiveRecord::Base
       tertiary_matches << self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
     end
       
-    # Show tertiary characters directly, so cut off at 20
+    # Show tertiary characters directly, so cut off at 35. Won't fit on one screen, 
+    # but that's alright for these few exceptions
     tertiary_matches = tertiary_matches.flatten.uniq
     
     if tertiary_matches.count > 35 && warn
-      puts "Ignoring #{ tertiary_matches.count - 20 } matches for #{ self }"
+      puts "Ignoring #{ tertiary_matches.count - 35 } matches for #{ self }"
     end
-    characters <<  tertiary_matches.slice(0,20)
+    characters <<  tertiary_matches.to_a.slice(0,35)
     
     characters.flatten.uniq
   end
