@@ -3,21 +3,27 @@
   = link_to @radical.simplified, @radical
 
 %%table.lookup
-  = render "first_radical"
+  - if @radical.first_screen || @radical.second_screen 
+    = render "first_radical"
+  - else
+    = render "characters"
   - if @radical.first_screen && @radical.secondary_radicals.count > 0
     %tr
       %td{colspan: 4, align: "center"}
         =link_to "None of these", first_radical_lookup_more_path(@radical)
-          
-%p  
-  Select a second radical.
-  - if @radical.simplified == "月"
-    E.g. if you're looking for 
-    %span.chinese 脑 
-    then click on 
-    = succeed '.' do
-      %span.chinese 亠
-  
+
+- if @radical.first_screen || @radical.second_screen           
+  %p  
+    Select a second radical.
+    - if @radical.simplified == "月"
+      E.g. if you're looking for 
+      %span.chinese 脑 
+      then click on 
+      = succeed '.' do
+        %span.chinese 亠
+- else
+  Matching characters
+
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
     mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}", "Alternatives": 0});

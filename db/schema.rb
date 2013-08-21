@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130821183854) do
+ActiveRecord::Schema.define(version: 20130821193917) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -48,6 +48,8 @@ ActiveRecord::Schema.define(version: 20130821183854) do
     t.integer  "second_screen_frequency", default: 0
     t.integer  "secondary_radicals",      default: [],    array: true
     t.integer  "tertiary_radicals",       default: [],    array: true
+    t.boolean  "third_screen",            default: false
+    t.integer  "third_screen_frequency",  default: 0
   end
 
   create_table "users", force: true do |t|

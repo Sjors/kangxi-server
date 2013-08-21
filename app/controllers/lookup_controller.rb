@@ -9,9 +9,22 @@ class LookupController < ApplicationController
     @radicals = Radical.where(second_screen: true)
   end
   
+  def index_more_more
+    @radicals = Radical.where(third_screen: true)
+  end
+  
   def first_radical
     @radical = Radical.find(params[:id])
-    @radicals = Radical.where("id in (?)", @radical.radicals)
+    
+    if @radical.first_screen || @radical.second_screen
+      @radicals = Radical.where("id in (?)", @radical.radicals)
+    else
+      # Slow!
+      matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
+      matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
+      matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
+      @characters = @radical.third_screen_potential_characters.to_a - matched_characters
+    end
   end
   
   def first_radical_more
@@ -36,8 +49,10 @@ class LookupController < ApplicationController
     
     if @first_radical.first_screen
       @characters = @first_radical.characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
-    else
-      @characters = @first_radical.second_screen_characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
+    else # Second screen characters:
+      matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
+      
+      @characters = @first_radical.second_screen_potential_characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)} - matched_characters_1
     end
     
   end

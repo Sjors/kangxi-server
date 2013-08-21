@@ -1,6 +1,9 @@
 %table.lookup
   = render "index", :number => 2
-
+  %tr
+    %td{colspan: 4, align: "center"}
+      =link_to "None of these", more_more_radicals_path
+      
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
     mixpanel.track("Lookup 2");

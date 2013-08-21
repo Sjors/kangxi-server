@@ -58,7 +58,7 @@ class Radical < ActiveRecord::Base
   def second_screen_matches(warn)
     matching_characters = []
     Radical.where("id in (?)", self.radicals).each do |second_radical|
-      matches = self.second_screen_characters.to_a.keep_if{|character| character.has_radicals(self, second_radical)}
+      matches = self.second_screen_potential_characters.to_a.keep_if{|character| character.has_radicals(self, second_radical)}
       matching_characters << matches
       if matches.count > 20 && warn
         puts "#{ first_radical } #{ second_radical } matches #{ matches.count } characters, 35 allowed."
@@ -68,12 +68,29 @@ class Radical < ActiveRecord::Base
     matching_characters.flatten.uniq.slice(0,35)
   end
   
-  def second_screen_characters
+  # Does not include secondary or tertiary matches (because there aren't any)
+  def third_screen_matches(warn)
+    matching_characters = []
+
+    matches = self.third_screen_potential_characters.to_a.flatten.uniq
+    
+    if matches.count > 20 && warn
+      puts "#{ self } in third screen matches #{ matches.count } characters, 35 allowed."
+    end
+    
+    matches.slice(0,35)
+  end
+  
+  def second_screen_potential_characters
     self.characters.to_a - self.first_screen_matches(false).to_a
   end
   
+  def third_screen_potential_characters
+    self.characters.to_a -  self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a
+  end
+  
   def no_screen_characters
-    self.characters.to_a - self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a
+    self.characters.to_a - self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a - self.third_screen_matches(false).to_a
   end
   
   def self.first_screen_radicals
@@ -94,8 +111,12 @@ class Radical < ActiveRecord::Base
     Radical.where("radicals.first_screen = ? and ambiguous = ?", false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
+  def self.third_screen_frequent_for_characters(characters)
+    Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ?", false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+  end
+  
   def self.no_screen_frequent_for_characters(characters)
-    Radical.where("radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+    Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
   def self.second_screen_plus_one_radical_character_matches(warn)
@@ -103,6 +124,16 @@ class Radical < ActiveRecord::Base
     
     self.where(second_screen: true).each do |first_radical|
       characters << first_radical.second_screen_matches(warn)
+    end
+    
+    characters.flatten.uniq
+  end
+  
+  def self.third_screen_character_matches(warn)
+    characters = []
+    
+    self.where(third_screen: true).each do |first_radical|
+      characters << first_radical.third_screen_matches(warn)
     end
     
     characters.flatten.uniq

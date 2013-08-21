@@ -1,5 +1,5 @@
 namespace :organize do 
-  task :all => [:ambiguous, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :report]
+  task :all => [:ambiguous, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :divide_third_screen, :report]
   
   desc "Group radicals"
   task :ambiguous => :environment do
@@ -76,9 +76,9 @@ namespace :organize do
     @radicals = Radical.second_screen_frequent_for_characters(unmatched_characters)
     puts "#{@radicals.to_a.count} non-first-screen radicals in those unmatched characters"
           
-    @frequencies =  @radicals.collect{|r| [r, (r.second_screen_characters - matched_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
+    @frequencies =  @radicals.collect{|r| [r, (r.second_screen_potential_characters - matched_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
     
-    # @frequencies =  @radicals.collect{|r| [r, r.second_screen_characters.count]}.sort_by{|r| -r[1]}     
+    # @frequencies =  @radicals.collect{|r| [r, r.second_screen_potential_characters.count]}.sort_by{|r| -r[1]}     
           
     @frequencies.slice(0,20).each do |radical_frequency|
       radical = radical_frequency[0]
@@ -86,7 +86,7 @@ namespace :organize do
       if frequency > 0
         radical.update(second_screen: true, second_screen_frequency: frequency)
         puts "#{radical} #{ radical.second_screen_frequency }"
-      elsif frequency == 1 && radical.to_s == r.second_screen_characters.first.to_s
+      elsif frequency == 1 && radical.to_s == r.second_screen_potential_characters.first.to_s
         puts "No composite characters left for #{ radical }"
       end
     end
@@ -95,7 +95,7 @@ namespace :organize do
   task :divide_second_screen => :environment do 
     Radical.where(second_screen: true).order(:second_screen_frequency => :desc).each do |first_radical|
       radicals = []
-      first_radical.second_screen_characters.each  do |character|
+      first_radical.second_screen_potential_characters.each  do |character|
         radicals << character.radicals.to_a.subtract_once(first_radical)
       end
     
@@ -110,7 +110,7 @@ namespace :organize do
       frequencies = []
       
       radicals.each do |radical| 
-        frequency = first_radical.second_screen_characters.keep_if{|character| character.has_radicals(first_radical, radical) }.count
+        frequency = first_radical.second_screen_potential_characters.keep_if{|character| character.has_radicals(first_radical, radical) }.count
         frequencies << [radical, frequency]
       end
       
@@ -127,6 +127,40 @@ namespace :organize do
     end
   end
   
+  task :third_screen => :environment do
+    Radical.all.each do |r|
+      r.update third_screen: false, third_screen_frequency: 0
+    end
+    
+    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
+    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
+    matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
+    
+    puts "#{matched_characters.count} matched characters for first and second screen"
+    
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters.to_a
+    puts "#{unmatched_characters.count} unmatched characters (including single radicals)"
+        
+    @radicals = Radical.third_screen_frequent_for_characters(unmatched_characters)
+    puts "#{@radicals.to_a.count} non-first and non-second screen radicals in those unmatched characters, including single radicals"
+    
+    # The third screen shows the characters directly, no radicals      
+    @frequencies =  @radicals.collect{|r| [r, (r.third_screen_potential_characters - matched_characters).count]}.sort_by{|r| -r[1]}     
+              
+    @frequencies.slice(0,20).each do |radical_frequency|
+      radical = radical_frequency[0]
+      frequency = radical_frequency[1]
+      if frequency > 0
+        radical.update(third_screen: true, third_screen_frequency: frequency)
+        puts "#{radical} #{ radical.third_screen_frequency }"
+      end
+    end
+  end
+
+  task :divide_third_screen => :environment do 
+    # We show only the characters, so nothing to do here...
+  end
+  
   task :report => :environment do
     @characters = []
     
@@ -134,7 +168,9 @@ namespace :organize do
     
     matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
         
-    matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
+    matched_characters_3 = Radical.third_screen_character_matches(Rails.env != "production")
+        
+    matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3].flatten.uniq
 
     puts "#{ matched_characters.count } characters can be found in 3 clicks"
         

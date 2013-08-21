@@ -17,6 +17,7 @@ KangxiRadicals::Application.routes.draw do
   get 'lookup/radical/:first_id/:second_id' => 'lookup#second_radical', :as => "second_radical_lookup"
   
   get 'lookup/more' => 'lookup#index_more', :as => 'more_radicals'
+  get 'lookup/more/more' => 'lookup#index_more_more', :as => 'more_more_radicals'
   
   
   root :to => 'lookup#index'
