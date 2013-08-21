@@ -52,6 +52,10 @@ namespace :organize do
         if frequencies.count > 20
           first_radical.update secondary_radicals: frequencies.slice(20,20).collect{|f| f[0].id} 
         end
+        
+        if frequencies.count > 40
+          first_radical.update tertiary_radicals: frequencies.slice(40,20).collect{|f| f[0].id} 
+        end
       else
         first_radical.update radicals: [], second_screen: false
       end
