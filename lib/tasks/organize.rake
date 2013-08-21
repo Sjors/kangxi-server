@@ -19,7 +19,7 @@ namespace :organize do
   end
   
   task :divide => :environment do 
-    Radical.all.each do |first_radical|
+    Radical.all.order(:position).each do |first_radical|
       if first_radical.first_screen
         radicals = []
         first_radical.characters.each  do |character|
@@ -41,7 +41,7 @@ namespace :organize do
           frequencies << [radical, frequency]
         end
     
-        frequencies.sort_by!{|frequency| -frequency[1]}
+        frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].position < first_radical.position)  ? 1 : 0),-frequency[1]]}
     
         unless Rails.env == "production"        
           frequencies.each do |frequency|
