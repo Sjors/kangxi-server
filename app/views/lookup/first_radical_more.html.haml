@@ -5,10 +5,14 @@
 
 %%table.lookup
   = render "first_radical"
+  - if @radical.first_screen && @radical.tertiary_radicals.count > 0
+    %tr
+      %td{colspan: 4, align: "center"}
+        =link_to "None of these", first_radical_lookup_more_characters_path(@radical)
           
 %p  
   Select a second radical from these alternatives
   
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
-    mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}", "Alternatives": true});
+    mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}", "Alternatives": 1});

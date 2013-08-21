@@ -19,6 +19,17 @@ class LookupController < ApplicationController
     @radicals = Radical.where("id in (?)", @radical.secondary_radicals)
   end
   
+  def first_radical_more_characters
+    @radical = Radical.find(params[:id])
+    @characters = []
+    
+    Radical.where("id in (?)", @radical.tertiary_radicals).each do |second_radical|      
+      @characters << @radical.characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
+    end
+    
+    @characters.flatten!.uniq!.slice!(0,35)
+  end
+  
   def second_radical
     @first_radical = Radical.find(params[:first_id])
     @second_radical = Radical.find(params[:second_id])
