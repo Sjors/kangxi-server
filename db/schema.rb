@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130821113129) do
+ActiveRecord::Schema.define(version: 20130821124555) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,14 +36,17 @@ ActiveRecord::Schema.define(version: 20130821113129) do
   create_table "radicals", force: true do |t|
     t.integer  "position"
     t.string   "simplified"
-    t.boolean  "variant",      default: false
+    t.boolean  "variant",                 default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "first_screen", default: false
+    t.boolean  "first_screen",            default: false
     t.string   "note"
-    t.integer  "radicals",     default: [],    array: true
-    t.boolean  "ambiguous",    default: false
-    t.integer  "frequency",    default: 0
+    t.integer  "radicals",                default: [],    array: true
+    t.boolean  "ambiguous",               default: false
+    t.integer  "frequency",               default: 0
+    t.boolean  "second_screen",           default: false
+    t.integer  "second_screen_radicals",  default: [],    array: true
+    t.integer  "second_screen_frequency", default: 0
   end
 
   create_table "users", force: true do |t|
