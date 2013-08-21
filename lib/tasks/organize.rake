@@ -124,15 +124,24 @@ namespace :organize do
   task :report => :environment do
     @characters = []
     
-    @characters << Radical.first_screen_plus_one_radical_character_matches(Rails.env != "production")
+    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(Rails.env != "production")
     
-    @characters << Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
-    
-    tally = @characters.flatten.uniq.count
-    
-    # Radical page has a link to Wikipedia, so also counts:
-    tally = tally + Radical.where("first_screen = ? OR second_screen = ?", true, true).count
-    
+    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
+        
+    tally = [matched_characters_1, matched_characters_2, Character.single_radicals].flatten.uniq.count
+
     puts "#{ tally } characters can be found in 3 clicks"
+  end
+  
+  task :excluded => :environment do
+    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
+    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
+            
+    matched_characters = [matched_characters_1, matched_characters_2, Character.single_radicals].flatten.uniq
+    
+    puts "#{matched_characters.count} matched characters."
+    
+    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters
+    puts "#{unmatched_characters.count} unmatched characters."
   end
 end

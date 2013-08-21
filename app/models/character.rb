@@ -37,4 +37,8 @@ class Character < ActiveRecord::Base
     self.radicals.to_a.subtract_once(first).include?(second)
   end
   
+  def self.single_radicals
+    Radical.where("first_screen = ? OR second_screen = ?", true, true).collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }
+  end
+  
 end
