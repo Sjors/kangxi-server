@@ -49,7 +49,7 @@ namespace :organize do
           end
         end
     
-        first_radical.update radicals: frequencies.slice(0,19).collect{|f| f[0].id }
+        first_radical.update radicals: frequencies.slice(0,20).collect{|f| f[0].id }
       else
         first_radical.update radicals: []
       end
