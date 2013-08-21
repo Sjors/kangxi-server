@@ -20,4 +20,8 @@ class Radical < ActiveRecord::Base
     end
     PinYin.of_string(simpl, :unicode).first
   end
+  
+  def to_s
+    self.simplified
+  end
 end

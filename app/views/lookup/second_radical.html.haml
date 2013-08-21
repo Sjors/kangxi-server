@@ -1,0 +1,18 @@
+.page-header
+  %h3
+    = link_to @first_radical.simplified + " " + @second_radical.simplified, @radical
+    characters
+
+%table.lookup
+  - @characters.each_slice(4) do |row|
+    %tr
+      - row.each do |character|
+        - if @first_radical.simplified == "月" && @second_radical.simplified == "亠" && character.simplified == "脑"
+          %td.chinese-lookup{:style => "background-color: yellow;"}
+            = link_to character, character.wiktionary_url
+        - else
+          %td.chinese-lookup
+            = link_to character, character.wiktionary_url          
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup Radical 2", {"Radical 1": "#{@first_radical.simplified}", "Radical 2": "#{@second_radical.simplified}"});

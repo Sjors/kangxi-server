@@ -24,4 +24,12 @@ class Character < ActiveRecord::Base
   def pinyin
     PinYin.of_string(self.simplified, :unicode).first
   end
+  
+  def to_s
+    self.simplified
+  end
+  
+  def wiktionary_url
+    "http://en.wiktionary.org/wiki/#{self.simplified}#Mandarin"
+  end
 end

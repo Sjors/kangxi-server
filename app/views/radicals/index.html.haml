@@ -14,10 +14,10 @@
       %td
         %span.chinese
           = render "radicals/linked", :radical => radical
-        - if can? :index_characters, Radical
-          = radical.currently_unmatched_characters.count
-          \/
-          = radical.characters.count
+        / - if can? :index_characters, Radical
+        /   = radical.currently_unmatched_characters.count
+        /   \/
+        /   = radical.characters.count
       / %td
       /   - Radical.where(position: radical.position, variant: true).each do |r|
       /     %span.chinese
@@ -30,9 +30,9 @@
         = radical.pinyin
       - if can? :show, radical
         %td.do-not-print= link_to "Info", "http://en.wikipedia.org/wiki/Radical_#{ radical.position }"
-      %td.do-not-print
-        = succeed '%' do
-          = (radical.characters.count.to_f / @current_character_count.to_f * 100.0).round
+      / %td.do-not-print
+      /   = succeed '%' do
+      /     = (radical.characters.count.to_f / @current_character_count.to_f * 100.0).round
         
       
 %br

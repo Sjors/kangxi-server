@@ -1,0 +1,23 @@
+%h4
+  Searching
+  = link_to @radical.simplified, @radical
+
+%%table.lookup
+  - @radicals.each_slice(4) do |row|
+    %tr
+      - row.each do |radical|
+        %td.chinese-lookup
+          = link_to radical.simplified, second_radical_lookup_path(@radical, radical)
+          
+%p  
+  Select a second radical.
+  - if @radical.simplified == "月"
+    E.g. if you're looking for 
+    %span.chinese 脑 
+    then click on 
+    = succeed '.' do
+      %span.chinese 亠
+  
+- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+  :javascript
+    mixpanel.track("Lookup Radical 1", {"Radical": "#{@radical.simplified}"});
