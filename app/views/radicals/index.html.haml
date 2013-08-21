@@ -14,7 +14,8 @@
       %td
         %span.chinese
           = render "radicals/linked", :radical => radical
-        / - if can? :index_characters, Radical
+        - if can? :index_characters, Radical
+          = radical.characters.count
         /   = radical.currently_unmatched_characters.count
         /   \/
         /   = radical.characters.count

@@ -11,16 +11,15 @@ namespace :organize do
   
   task :first_screen => :environment do
     # %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 冖 小 夕 勹 丨 丿 二 乛 卜)
-    # Strife to order these with decreasing popularity:
     @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 冖 小 夕 勹  二 卜 口 田 氵)
     Radical.all.each do |radical|
-      radical.update(first_screen: @radicals.include?(radical.simplified))
+      radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.characters.count)
     end
     
   end
   
   task :divide => :environment do 
-    Radical.all.order(:position).each do |first_radical|
+    Radical.all.order(:frequency => :desc).each do |first_radical|
       if first_radical.first_screen
         radicals = []
         first_radical.characters.each  do |character|
@@ -42,7 +41,7 @@ namespace :organize do
           frequencies << [radical, frequency]
         end
     
-        frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].position > first_radical.position)  ? 1 : 0),-frequency[1]]}
+        frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].frequency > first_radical.frequency)  ? 1 : 0),-frequency[1]]}
     
         unless Rails.env == "production"        
           frequencies.each do |frequency|
