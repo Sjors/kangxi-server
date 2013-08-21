@@ -41,7 +41,7 @@ namespace :organize do
           frequencies << [radical, frequency]
         end
     
-        frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].frequency > first_radical.frequency)  ? 1 : 0),-frequency[1]]}
+        frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].frequency < first_radical.frequency)  ? 1 : 0),-frequency[1]]}
     
         unless Rails.env == "production"        
           frequencies.each do |frequency|
