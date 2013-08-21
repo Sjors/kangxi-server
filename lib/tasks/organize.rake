@@ -72,7 +72,9 @@ namespace :organize do
     @radicals = Radical.second_screen_frequent_for_characters(unmatched_characters)
     puts "#{@radicals.to_a.count} non-first-screen radicals in those unmatched characters"
           
-    @frequencies =  @radicals.collect{|r| [r, r.second_screen_characters.count]}.sort_by{|r| -r[1]}     
+    @frequencies =  @radicals.collect{|r| [r, (r.second_screen_characters - matched_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
+    
+    # @frequencies =  @radicals.collect{|r| [r, r.second_screen_characters.count]}.sort_by{|r| -r[1]}     
           
     @frequencies.slice(0,20).each do |radical_frequency|
       radical = radical_frequency[0]
