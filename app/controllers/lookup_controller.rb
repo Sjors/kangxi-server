@@ -17,7 +17,7 @@ class LookupController < ApplicationController
     
     # @characters = Character.joins(:radicals).where("radicals.id = ?", @first_radical.id).where("radicals.id = ?", @second_radical.id)
     
-    @characters = @first_radical.characters.keep_if{|c| c.radicals.include?(@second_radical)}
+    @characters = @first_radical.characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
     
   end
 end
