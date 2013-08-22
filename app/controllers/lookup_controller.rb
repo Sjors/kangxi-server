@@ -13,6 +13,10 @@ class LookupController < ApplicationController
     @radicals = Radical.where(third_screen: true)
   end
   
+  def index_more_more_characters
+    @characters = Character.where(fourth_screen: true)
+  end
+  
   def first_radical
     @radical = Radical.find(params[:id])
     

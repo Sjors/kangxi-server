@@ -1,9 +1,9 @@
 namespace :organize do 
-  task :all => [:clean, :ambiguous, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :divide_third_screen, :report]
+  task :all => [:clean, :ambiguous, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
   
   desc "Clean"
   task :clean => :environment do
-    Character.update_all("first_screen = false, second_screen = false, third_screen = false")
+    Character.update_all("first_screen = false, second_screen = false, third_screen = false, fourth_screen = false")
     Radical.update_all("ambiguous = false, first_screen = false, second_screen = false, third_screen = false, frequency = 0, second_screen_frequency = 0, third_screen_frequency = 0, radicals = '{}', secondary_radicals = '{}', tertiary_radicals = '{}'")    
   end
   
@@ -164,8 +164,13 @@ namespace :organize do
     end
   end
 
-  task :divide_third_screen => :environment do 
-    # We show only the characters, so nothing to do here...
+  task :fourth_screen => :environment do 
+    # 50 characters with a preference for complex radicals
+    unmatched_characters = Character.where(first_screen: false, second_screen: false, third_screen: false).includes(:radicals).where("radicals.id IS NOT NULL")
+  
+    unmatched_characters.sort_by{|a| -a.radicals.maximum(:position)}.slice(0,50).each do |c|
+      c.update fourth_screen: true
+    end
   end
   
   task :report => :environment do
@@ -176,36 +181,32 @@ namespace :organize do
     matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
         
     matched_characters_3 = Radical.third_screen_character_matches(Rails.env != "production")
+    
+    matched_characters_4 = Character.where(fourth_screen: true)
         
-    matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3].flatten.uniq
+    matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3, matched_characters_4].flatten.uniq
 
     puts "#{ matched_characters.count } characters can be found in 3 clicks"
         
-    unmatched_characters = Character.where(first_screen: false, second_screen: false, third_screen: false).includes(:radicals).where("radicals.id IS NOT NULL")
+    unmatched_characters = Character.where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).includes(:radicals).where("radicals.id IS NOT NULL")
     puts "#{unmatched_characters.count} unmatched characters, including single radicals."
   end
   
   task :excluded => :environment do
-    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
-    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
-            
-    matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
- 
-    unmatched_characters = Character.all.includes(:radicals).where("radicals.id IS NOT NULL").to_a - matched_characters.to_a - Character.single_radicals.to_a
+    unmatched_characters = Character.where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).includes(:radicals).where("radicals.id IS NOT NULL")
   
-    puts "#{ matched_characters.count } characters can be found in 3 clicks"
     puts "#{unmatched_characters.count} unmatched characters."
   
-    @radicals = Radical.no_screen_frequent_for_characters(unmatched_characters)
-    puts "#{@radicals.to_a.count} non-first and non-second-screen radicals in those unmatched characters"
+    @radicals = Radical.no_screen_by_frequency
+    puts "#{@radicals.to_a.count} non-first, second, third radicals in those unmatched characters"
           
-    @frequencies =  @radicals.collect{|r| [r, (r.no_screen_characters - matched_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
+    @frequencies =  @radicals.collect{|r| [r, (r.no_screen_characters - [Character.find_by(simplified: r.simplified)]).count]}.sort_by{|r| -r[1]}     
           
     @frequencies.each do |radical_frequency|
       radical = radical_frequency[0]
       frequency = radical_frequency[1]
       if frequency > 0
-        puts "#{radical} #{ frequency }: #{ (radical.no_screen_characters - matched_characters - [Character.find_by(simplified: radical.simplified)]).join(' ') }"
+        puts "#{radical} #{ frequency }: #{ (radical.no_screen_characters - [Character.find_by(simplified: radical.simplified)]).join(' ') }"
       end
     end
   

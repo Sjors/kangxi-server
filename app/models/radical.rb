@@ -90,7 +90,7 @@ class Radical < ActiveRecord::Base
   end
   
   def no_screen_characters
-    self.characters.where(first_screen: false, second_screen: false, third_screen: false)
+    self.characters.where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false)
   end
   
   def self.first_screen_radicals
@@ -116,7 +116,7 @@ class Radical < ActiveRecord::Base
   end
   
   def self.no_screen_by_frequency
-    Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false, false).joins(:characters).where(first_screen: false, second_screen: false, third_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+    Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false, false).joins(:characters).where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
   def self.second_screen_plus_one_radical_character_matches(warn)
