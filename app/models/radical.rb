@@ -82,15 +82,15 @@ class Radical < ActiveRecord::Base
   end
   
   def second_screen_potential_characters
-    self.characters.to_a - self.first_screen_matches(false).to_a
+    self.characters.where(first_screen: false)
   end
   
   def third_screen_potential_characters
-    self.characters.to_a -  self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a
+    self.characters.where(first_screen: false, second_screen: false)
   end
   
   def no_screen_characters
-    self.characters.to_a - self.first_screen_matches(false).to_a - self.second_screen_matches(false).to_a - self.third_screen_matches(false).to_a
+    self.characters.where(first_screen: false, second_screen: false, third_screen: false)
   end
   
   def self.first_screen_radicals
@@ -107,16 +107,16 @@ class Radical < ActiveRecord::Base
     characters.flatten.uniq
   end
   
-  def self.second_screen_frequent_for_characters(characters)
-    Radical.where("radicals.first_screen = ? and ambiguous = ?", false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+  def self.second_screen_by_frequency
+    Radical.where("radicals.first_screen = ? and ambiguous = ?", false, false).joins(:characters).where(first_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
-  def self.third_screen_frequent_for_characters(characters)
-    Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ?", false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+  def self.third_screen_by_frequency
+    Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ?", false, false, false).joins(:characters).where(first_screen: false, second_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
-  def self.no_screen_frequent_for_characters(characters)
-    Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false, false).joins(:characters).where("characters.id not in (?)", characters.collect{|c| c.id}).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
+  def self.no_screen_by_frequency
+    Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and ambiguous = ?", false, false, false, false).joins(:characters).where(first_screen: false, second_screen: false, third_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
   def self.second_screen_plus_one_radical_character_matches(warn)

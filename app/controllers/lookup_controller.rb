@@ -19,11 +19,7 @@ class LookupController < ApplicationController
     if @radical.first_screen || @radical.second_screen
       @radicals = Radical.where("id in (?)", @radical.radicals)
     else
-      # Slow!
-      matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
-      matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(false)
-      matched_characters = [matched_characters_1, matched_characters_2].flatten.uniq
-      @characters = @radical.third_screen_potential_characters.to_a - matched_characters
+      @characters = @radical.third_screen_potential_characters
     end
   end
   
@@ -48,11 +44,9 @@ class LookupController < ApplicationController
     @second_radical = Radical.find(params[:second_id])
     
     if @first_radical.first_screen
-      @characters = @first_radical.characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
+      @characters = @first_radical.characters.where(first_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
     else # Second screen characters:
-      matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(false)
-      
-      @characters = @first_radical.second_screen_potential_characters.keep_if{|c| c.has_radicals(@first_radical, @second_radical)} - matched_characters_1
+      @characters = @first_radical.characters.where(second_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)} 
     end
     
   end
