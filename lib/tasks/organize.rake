@@ -1,5 +1,5 @@
 namespace :organize do 
-  task :all => [:clean, :ambiguous, :synonyms, :first_screen, :divide_first_screen] #, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
+  task :all => [:clean, :ambiguous, :synonyms, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
   
   desc "Clean"
   task :clean => :environment do
@@ -9,7 +9,7 @@ namespace :organize do
   
   desc "Group radicals"
   task :ambiguous => :environment do
-    @radicals = %w(一 丨 丶 丿 亅 乚 乛 𠃌 𠃊)
+    @radicals = %w(一 丨 丶 丿 亅 乛 𠃊)
     Radical.all.each do |radical|
       radical.update(ambiguous: @radicals.include?(radical.simplified))
     end
