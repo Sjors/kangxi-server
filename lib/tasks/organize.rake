@@ -30,6 +30,7 @@ namespace :organize do
     # Radical.make_synonyms("土", ["士"])
     # Radical.make_synonyms("口", ["囗"])
     Radical.make_synonyms("厂", ["广", "疒"])
+    Radical.make_synonyms("𠃌", ["勹", "刀", "力"])
     Radical.make_synonyms("冂", %w(风 用 禸 肉 雨))
     Radical.make_synonyms("王", %w(玉))
     Radical.make_synonyms("冖", %w(宀))
@@ -128,7 +129,9 @@ namespace :organize do
       frequency = radical_frequency[1]
       if frequency > 0
         radical.update(second_screen: true, second_screen_frequency: frequency)
-        puts "#{radical} #{ radical.second_screen_frequency }"
+        unless Rails.env == "production"      
+          puts "#{radical} #{ radical.second_screen_frequency }"
+        end
       end
     end
   end
@@ -201,7 +204,9 @@ namespace :organize do
       frequency = radical_frequency[1]
       if frequency > 0
         radical.update(third_screen: true, third_screen_frequency: frequency)
-        puts "#{radical} #{ radical.third_screen_frequency }"
+        unless Rails.env == "production" 
+          puts "#{radical} #{ radical.third_screen_frequency }"
+        end
       end
       
       @character_ids << radical_frequency[2]
@@ -224,11 +229,11 @@ namespace :organize do
   task :report => :environment do
     @characters = []
     
-    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(Rails.env != "production")
+    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches
     
-    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(Rails.env != "production")
+    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches
         
-    matched_characters_3 = Radical.third_screen_character_matches(Rails.env != "production")
+    matched_characters_3 = Radical.third_screen_character_matches
     
     matched_characters_4 = Character.where(fourth_screen: true)
         
