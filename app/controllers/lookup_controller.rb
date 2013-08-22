@@ -37,7 +37,7 @@ class LookupController < ApplicationController
     @characters = []
     
     Radical.where("id in (?)", @radical.tertiary_radicals).each do |second_radical|      
-      @characters << @radical.characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
+      @characters << @radical.with_synonym_characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
     end
     
     @characters.flatten!.uniq!.to_a.slice(0,35)
@@ -48,9 +48,9 @@ class LookupController < ApplicationController
     @second_radical = Radical.find(params[:second_id])
     
     if @first_radical.first_screen
-      @characters = @first_radical.characters.where(first_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
+      @characters = @first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
     else # Second screen characters:
-      @characters = @first_radical.characters.where(second_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)} 
+      @characters = @first_radical.with_synonym_characters.where(second_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)} 
     end
     
   end

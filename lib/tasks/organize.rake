@@ -1,10 +1,10 @@
 namespace :organize do 
-  task :all => [:clean, :ambiguous, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
+  task :all => [:clean, :ambiguous, :synonyms, :first_screen, :divide_first_screen] #, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
   
   desc "Clean"
   task :clean => :environment do
     Character.update_all("first_screen = false, second_screen = false, third_screen = false, fourth_screen = false")
-    Radical.update_all("ambiguous = false, first_screen = false, second_screen = false, third_screen = false, frequency = 0, second_screen_frequency = 0, third_screen_frequency = 0, radicals = '{}', secondary_radicals = '{}', tertiary_radicals = '{}'")    
+    Radical.update_all("ambiguous = false, first_screen = false, second_screen = false, third_screen = false, frequency = 0, second_screen_frequency = 0, third_screen_frequency = 0, radicals = '{}', secondary_radicals = '{}', tertiary_radicals = '{}', synonyms = '{}', is_synonym = false")    
   end
   
   desc "Group radicals"
@@ -14,44 +14,83 @@ namespace :organize do
       radical.update(ambiguous: @radicals.include?(radical.simplified))
     end
   end
+  
+  desc "Synonyms"
+  task :synonyms => :environment do
+    # yì and fù
+    yi_fu = Radical.where(simplified: "阝")
+    yi_fu.first.update synonyms: [yi_fu.last.id]
+    yi_fu.last.update is_synonym: true
+    
+    # wǎng and mù
+    wang_mu = Radical.where(simplified: "罒")
+    wang_mu.first.update synonyms: [wang_mu.last.id]
+    wang_mu.last.update is_synonym: true
+    
+    # Radical.make_synonyms("土", ["士"])
+    # Radical.make_synonyms("口", ["囗"])
+    Radical.make_synonyms("厂", ["广", "疒"])
+    Radical.make_synonyms("冂", %w(风 用 禸 肉 雨))
+    Radical.make_synonyms("王", %w(玉))
+    Radical.make_synonyms("冖", %w(宀))
+    Radical.make_synonyms("夂", %w(夊))
+    # Radical.make_synonyms("又", %w(殳))
+    Radical.make_synonyms("匕", %w(比))
+    Radical.make_synonyms("毌", %w(毌))
+    Radical.make_synonyms("肀", %w(聿))
+    Radical.make_synonyms("夕", %w(舛))
+    Radical.make_synonyms("巳", %w(色 己 已 邑))
+  end
 
   desc "First Screen"
   task :first_screen => :environment do
     @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
     Radical.all.each do |radical|
-      radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.characters.count)
+      radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.with_synonym_characters.count)
     end
   end
   
   task :divide_first_screen => :environment do 
+    @character_ids = []
+    
     Radical.where(first_screen: true).order(:frequency => :desc).each do |first_radical|
       radicals = []
-      first_radical.characters.each  do |character|
-        radicals << character.radicals.to_a.subtract_once(first_radical)
+      first_radical.with_synonym_characters.each  do |character|
+        if first_radical.synonyms.count == 0
+          radicals << character.radicals.to_a.subtract_once(first_radical)
+        else # Substract no more than one of the synonyms; doesn't have to be the correct one.
+          Radical.where("id = ? OR id in (?)", first_radical.id, first_radical.synonyms).each do |r|
+            subtracted =  character.radicals.to_a.subtract_once(first_radical)
+            if subtracted.length != character.radicals.to_a.length
+              radicals << subtracted
+              break
+            end
+          end
+        end
       end
       
-      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous }
+      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || radical.is_synonym }
    
       unless Rails.env == "production"
-        puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unqique non-ambiguous second radicals"
+        puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unique non-ambiguous non-synonym second radicals"
         puts ""
       end
   
       frequencies = []
   
       radicals.each do |radical| 
-        characters = first_radical.characters.keep_if{|character| character.has_radicals(first_radical, radical) }
+        characters = first_radical.with_synonym_characters.keep_if{|character| character.has_radicals(first_radical, radical) }
         frequency = characters.count
-        frequencies << [radical, frequency, characters]
+        frequencies << [radical, frequency, characters.collect{|c| c.id}]
       end
   
       frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].first_screen && frequency[0].frequency < first_radical.frequency)  ? 1 : 0),-frequency[1]]}
   
-      # unless Rails.env == "production"        
-      #   frequencies.each do |frequency|
-      #     puts frequency[0].simplified + " " + frequency[1].to_s
-      #   end
-      # end
+      unless Rails.env == "production"        
+        frequencies.each do |frequency|
+          puts frequency[0].simplified + Radical.where("id in (?)",frequency[0].synonyms).collect{|r| r.simplified}.join(" ") + " " + frequency[1].to_s
+        end
+      end
   
       first_radical.update radicals: frequencies.slice(0,20).collect{|f| f[0].id}
       
@@ -63,13 +102,15 @@ namespace :organize do
         first_radical.update tertiary_radicals: frequencies.slice(40,20).collect{|f| f[0].id} 
       end
       
-      frequencies.slice(0,60).collect{|f| f[2]}.flatten.uniq.each do |character|
-        character.update first_screen: true
-      end
+      @character_ids << frequencies.slice(0,60).collect{|f| f[2]}.flatten.uniq
     end
+    
+    Character.where("id in (?)", @character_ids.flatten.uniq).update_all first_screen: true
   end
     
   task :second_screen => :environment do
+    Radical.update_all(second_screen: false, second_screen_frequency: 0)
+    Character.update_all(second_screen: false)
     
     matched_characters = Character.where(first_screen: true)
     puts "#{matched_characters.count} matched characters for first screen"
@@ -93,6 +134,8 @@ namespace :organize do
   end
 
   task :divide_second_screen => :environment do 
+    @character_ids = []
+    
     Radical.where(second_screen: true).order(:second_screen_frequency => :desc).each do |first_radical|
       radicals = []
       first_radical.second_screen_potential_characters.each  do |character|
@@ -100,7 +143,7 @@ namespace :organize do
       end
     
     
-      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || Radical.first_screen_radicals.include?(radical) }
+      radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || radical.is_synonym || Radical.first_screen_radicals.include?(radical) }
        
       unless Rails.env == "production"
         puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unique second radicals that don't occur in the first screen"
@@ -112,7 +155,7 @@ namespace :organize do
       radicals.each do |radical| 
         characters = first_radical.second_screen_potential_characters.keep_if{|character| character.has_radicals(first_radical, radical) }
         frequency = characters.count
-        frequencies << [radical, frequency, characters]
+        frequencies << [radical, frequency, characters.collect{|c| c.id}]
       end
       
       frequencies.sort_by!{|frequency| [(frequency[0] == first_radical ? 0 : 1) , ((frequency[0].second_screen && frequency[0].second_screen_frequency < first_radical.second_screen_frequency)  ? 1 : 0),-frequency[1]]}
@@ -126,13 +169,17 @@ namespace :organize do
             
       first_radical.update radicals: frequencies.slice(0,20).collect{|f| f[0].id }
       
-      frequencies.slice(0,20).collect{|f| f[2]}.flatten.uniq.each do |character|
-        character.update second_screen: true
-      end
+      @character_ids << frequencies.slice(0,20).collect{|f| f[2]}.flatten.uniq
+       
     end
+    
+    Character.where("id in (?)", @character_ids.flatten.uniq).update_all second_screen: true
+    
   end
   
   task :third_screen => :environment do
+    @character_ids = []
+    
     Radical.update_all(third_screen: false, third_screen_frequency: 0)
     Character.update_all(third_screen: false)
     
@@ -147,7 +194,7 @@ namespace :organize do
     puts "#{@radicals.to_a.count} non-first and non-second screen radicals in those unmatched characters, including single radicals"
     
     # The third screen shows the characters directly, no radicals      
-    @frequencies =  @radicals.collect{|r| [r, r.third_screen_potential_characters.count, r.third_screen_potential_characters]}.sort_by{|r| -r[1]}     
+    @frequencies =  @radicals.collect{|r| [r, r.third_screen_potential_characters.count, r.third_screen_potential_characters.collect{|c| c.id}]}.sort_by{|r| -r[1]}     
               
     @frequencies.slice(0,20).each do |radical_frequency|
       radical = radical_frequency[0]
@@ -157,11 +204,12 @@ namespace :organize do
         puts "#{radical} #{ radical.third_screen_frequency }"
       end
       
-      radical_frequency[2].each do |c|
-        c.update third_screen: true
-      end
+      @character_ids << radical_frequency[2]
       
     end
+    
+    Character.where("id in (?)", @character_ids.flatten.uniq).update_all third_screen: true
+    
   end
 
   task :fourth_screen => :environment do 

@@ -34,7 +34,12 @@ class Character < ActiveRecord::Base
   end
   
   def has_radicals(first, second)
-    self.radicals.to_a.subtract_once(first).include?(second)
+    Radical.where("id = ? OR id IN (?)", first.id, first.synonyms).each do |first_radical|
+      Radical.where("id = ? OR id IN (?)", second.id, second.synonyms).each do |second_radical|
+        return true if self.radicals.to_a.subtract_once(first_radical).include?(second_radical)
+      end
+    end
+    return false
   end
   
   def self.single_radicals
