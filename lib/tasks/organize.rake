@@ -237,15 +237,18 @@ namespace :organize do
   task :report => :environment do
     @characters = []
     
-    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(true)
-    
-    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(true)
-        
-    matched_characters_3 = Radical.third_screen_character_matches(true)
-    
-    matched_characters_4 = Character.where(fourth_screen: true)
-        
-    matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3, matched_characters_4].flatten.uniq
+    # matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(true)
+    # 
+    # matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(true)
+    #     
+    # matched_characters_3 = Radical.third_screen_character_matches(true)
+    # 
+    # matched_characters_4 = Character.where(fourth_screen: true)
+    #     
+    # matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3, matched_characters_4].flatten.uniq
+
+    matched_characters = Character.where("first_screen = ? OR second_screen = ? OR third_screen = ? OR fourth_screen = ?", true, true, true, true)
+
 
     puts "#{ matched_characters.count } characters can be found in 3 clicks"
         
