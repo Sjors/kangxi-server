@@ -106,8 +106,16 @@ class Radical < ActiveRecord::Base
   end
   
   def tooltip
-    return "" unless self.synonyms.length > 0
-    "Also " + Radical.where("id in (?)", self.synonyms).collect{|r| r.to_s}.join(" ")
+    tips = []
+    if self.synonyms.length > 0
+      tips << "Also " + Radical.where("id in (?)", self.synonyms).collect{|r| r.to_s}.join(" ")
+    end
+    
+    if self.do_not_confuse.length > 0
+      tips << "Not " + Radical.where("id in (?)", self.do_not_confuse).collect{|r| r.to_s}.join(" ")
+    end
+    
+    tips.join("\n")
   end
   
   def self.first_screen_radicals

@@ -1,5 +1,5 @@
 namespace :organize do 
-  task :all => [:clean, :ambiguous, :synonyms, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
+  task :all => [:clean, :ambiguous, :synonyms, :confuse, :first_screen, :divide_first_screen, :second_screen, :divide_second_screen, :third_screen, :fourth_screen, :report]
   
   desc "Clean"
   task :clean => :environment do
@@ -41,6 +41,14 @@ namespace :organize do
     Radical.make_synonyms("肀", %w(聿))
     Radical.make_synonyms("夕", %w(舛))
     Radical.make_synonyms("巳", %w(色 己 已 邑))
+  end
+  
+  desc "Mark confusing characters (for toolips)"
+  task :confuse => :environment do
+    Radical.find_by(simplified: "土").update do_not_confuse: [Radical.find_by(simplified: "士").id]
+    Radical.find_by(simplified: "士").update do_not_confuse: [Radical.find_by(simplified: "土").id]
+    Radical.find_by(simplified: "口").update do_not_confuse: [Radical.find_by(simplified: "囗").id]
+    Radical.find_by(simplified: "囗").update do_not_confuse: [Radical.find_by(simplified: "口").id]
   end
 
   desc "First Screen"
@@ -229,11 +237,11 @@ namespace :organize do
   task :report => :environment do
     @characters = []
     
-    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches
+    matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(true)
     
-    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches
+    matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(true)
         
-    matched_characters_3 = Radical.third_screen_character_matches
+    matched_characters_3 = Radical.third_screen_character_matches(true)
     
     matched_characters_4 = Character.where(fourth_screen: true)
         

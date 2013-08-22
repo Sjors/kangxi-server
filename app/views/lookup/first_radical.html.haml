@@ -1,6 +1,6 @@
 %h4
   Searching
-  = link_to @radical.simplified, @radical
+  = link_to @radical.simplified, @radical, 'data-toggle' => "tooltip",  :title=> @radical.tooltip
 
 %%table.lookup
   - if @radical.first_screen || @radical.second_screen 
