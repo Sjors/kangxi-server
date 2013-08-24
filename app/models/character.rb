@@ -17,6 +17,20 @@ class Character < ActiveRecord::Base
     (current_radical_count - count).times { self.radicals << radical }
   end
   
+  def substract_once_with_synonyms(first_radical)
+    if first_radical.synonyms.count == 0
+      return self.radicals.to_a.subtract_once(first_radical)
+    else # Substract no more than one of the synonyms; doesn't have to be the correct one.
+      Radical.where("id = ? OR id in (?)", first_radical.id, first_radical.synonyms).each do |r|
+        subtracted =  self.radicals.to_a.subtract_once(first_radical)
+        if subtracted.length != self.radicals.to_a.length
+          return subtracted
+          break
+        end
+      end
+    end
+  end
+  
   def self.unmatched_by_first_screen_ids
     self.includes(:radicals).where("radicals.first_screen = ?", true).references(:radicals).uniq.collect{|c| c.id}
   end
@@ -35,8 +49,10 @@ class Character < ActiveRecord::Base
   
   def has_radicals(first, second)
     Radical.where("id = ? OR id IN (?)", first.id, first.synonyms).each do |first_radical|
-      Radical.where("id = ? OR id IN (?)", second.id, second.synonyms).each do |second_radical|
-        return true if self.radicals.to_a.subtract_once(first_radical).include?(second_radical)
+      if(self.radicals.to_a.subtract_once(first_radical).count == self.radicals.count - 1)
+        Radical.where("id = ? OR id IN (?)", second.id, second.synonyms).each do |second_radical|
+          return true if self.radicals.to_a.subtract_once(first_radical).include?(second_radical)
+        end
       end
     end
     return false

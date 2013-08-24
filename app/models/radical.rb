@@ -13,11 +13,9 @@ class Radical < ActiveRecord::Base
   end
   
   def with_synonym_characters
-    return self.characters if self.synonyms.count == 0
+    return self.characters.group("characters.id") if self.synonyms.count == 0
     
-    Character.joins(:radicals).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms)
-    
-    # Radical.where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).joins(:characters)
+    Character.joins(:radicals).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
   end
   
   def pinyin
@@ -91,18 +89,18 @@ class Radical < ActiveRecord::Base
   
   def second_screen_potential_characters
     # self.characters.where(first_screen: false)
-    Character.joins(:radicals).where(first_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms)
+    Character.joins(:radicals).where(first_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
   end
   
   def third_screen_potential_characters
     # self.characters.where(first_screen: false, second_screen: false)
-    Character.joins(:radicals).where(first_screen: false, second_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms)
+    Character.joins(:radicals).where(first_screen: false, second_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
     
   end
   
   def no_screen_characters
     # self.characters.where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false)
-    Character.joins(:radicals).where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms)
+    Character.joins(:radicals).where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
   end
   
   def tooltip
@@ -134,14 +132,14 @@ class Radical < ActiveRecord::Base
   
   def self.second_screen_by_frequency
     Radical.where("radicals.first_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ?", false).count]
+      [r, r.with_synonym_characters.where("characters.first_screen = ?", false).to_a.count]
     }.sort_by{|a| -a[1] }.collect{|a| a[0]}
       # joins(:characters).where(first_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
   end
   
   def self.third_screen_by_frequency
     Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ?", false, false).count]
+      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ?", false, false).to_a.count]
     }.sort_by{|a| -a[1] }.collect{|a| a[0]}
     
     # Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false).joins(:characters).where(first_screen: false, second_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
@@ -149,7 +147,7 @@ class Radical < ActiveRecord::Base
   
   def self.no_screen_by_frequency
     Radical.where("radicals.first_screen = ? and radicals.second_screen = ?  and radicals.first_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ? AND characters.second_screen = ?", false, false, false).count]
+      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ? AND characters.second_screen = ?", false, false, false).to_a.count]
     }.sort_by{|a| -a[1] }.collect{|a| a[0]}
     
     

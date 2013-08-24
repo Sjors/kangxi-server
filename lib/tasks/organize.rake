@@ -57,7 +57,7 @@ namespace :organize do
     @radicals = %w(人 亻 日 月 木 艹 辶 讠 宀 亠 又 禾 十 田 氵 丷 扌 大 厶 冂)
     
     Radical.all.each do |radical|
-      radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.with_synonym_characters.count)
+      radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.with_synonym_characters.to_a.count)
     end
   end
   
@@ -67,17 +67,7 @@ namespace :organize do
     Radical.where(first_screen: true).order(:frequency => :desc).each do |first_radical|
       radicals = []
       first_radical.with_synonym_characters.each  do |character|
-        if first_radical.synonyms.count == 0
-          radicals << character.radicals.to_a.subtract_once(first_radical)
-        else # Substract no more than one of the synonyms; doesn't have to be the correct one.
-          Radical.where("id = ? OR id in (?)", first_radical.id, first_radical.synonyms).each do |r|
-            subtracted =  character.radicals.to_a.subtract_once(first_radical)
-            if subtracted.length != character.radicals.to_a.length
-              radicals << subtracted
-              break
-            end
-          end
-        end
+        radicals << character.substract_once_with_synonyms(first_radical)
       end
       
       radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || radical.is_synonym }
@@ -152,7 +142,8 @@ namespace :organize do
     Radical.where(second_screen: true).order(:second_screen_frequency => :desc).each do |first_radical|
       radicals = []
       first_radical.second_screen_potential_characters.each  do |character|
-        radicals << character.radicals.to_a.subtract_once(first_radical)
+        # radicals << character.radicals.to_a.subtract_once(first_radical)
+        radicals << character.substract_once_with_synonyms(first_radical)
       end
     
     
@@ -207,7 +198,7 @@ namespace :organize do
     puts "#{@radicals.to_a.count} non-first and non-second screen radicals in those unmatched characters, including single radicals"
     
     # The third screen shows the characters directly, no radicals      
-    @frequencies =  @radicals.collect{|r| [r, r.third_screen_potential_characters.count, r.third_screen_potential_characters.collect{|c| c.id}]}.sort_by{|r| -r[1]}     
+    @frequencies =  @radicals.collect{|r| [r, r.third_screen_potential_characters.to_a.count, r.third_screen_potential_characters.to_a.collect{|c| c.id}]}.sort_by{|r| -r[1]}     
               
     @frequencies.slice(0,20).each do |radical_frequency|
       radical = radical_frequency[0]
