@@ -120,16 +120,6 @@ class Radical < ActiveRecord::Base
     self.where(first_screen: true)
   end
   
-  def self.first_screen_plus_one_radical_character_matches(warn)
-    characters = []
-    
-    self.where(first_screen: true).each do |first_radical|
-      characters << first_radical.first_screen_matches(warn)
-    end
-    
-    characters.flatten.uniq
-  end
-  
   def self.second_screen_by_frequency
     Radical.where("radicals.first_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false).collect {|r|
       [r, r.with_synonym_characters.where("characters.first_screen = ?", false).to_a.count]
@@ -152,26 +142,6 @@ class Radical < ActiveRecord::Base
     
     
     # Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and is_synonym = ?", false, false, false).joins(:characters).where("characters.first_screen = ? AND characters.second_screen = ? AND characters.third_screen = ? AND characters.fourth_screen = ?", false, false, false, false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
-  end
-  
-  def self.second_screen_plus_one_radical_character_matches(warn)
-    characters = []
-    
-    self.where(second_screen: true).each do |first_radical|
-      characters << first_radical.second_screen_matches(warn)
-    end
-    
-    characters.flatten.uniq
-  end
-  
-  def self.third_screen_character_matches(warn)
-    characters = []
-    
-    self.where(third_screen: true).each do |first_radical|
-      characters << first_radical.third_screen_matches(warn)
-    end
-    
-    characters.flatten.uniq
   end
   
   def self.make_synonyms(primary, synonyms)

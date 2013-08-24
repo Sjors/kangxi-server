@@ -53,8 +53,8 @@ namespace :organize do
 
   desc "First Screen"
   task :first_screen => :environment do
-    # @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
-    @radicals = %w(人 亻 日 月 木 艹 辶 讠 宀 亠 又 禾 十 田 氵 丷 扌 大 厶 冂)
+    @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
+    # @radicals = %w(人 亻 日 月 木 艹 辶 讠 宀 亠 又 禾 十 田 氵 丷 扌 大 厶 冂)
     
     Radical.all.each do |radical|
       radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.with_synonym_characters.to_a.count)
@@ -72,7 +72,7 @@ namespace :organize do
       
       radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || radical.is_synonym }
    
-      unless Rails.env == "production"
+      unless Rails.env == "production" && radicals.count <= 20
         puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unique non-ambiguous non-synonym second radicals"
         puts ""
       end
@@ -129,7 +129,7 @@ namespace :organize do
       frequency = radical_frequency[1]
       if frequency > 0
         radical.update(second_screen: true, second_screen_frequency: frequency)
-        unless Rails.env == "production"      
+        unless Rails.env == "production"     
           puts "#{radical} #{ radical.second_screen_frequency }"
         end
       end
@@ -149,7 +149,7 @@ namespace :organize do
     
       radicals = radicals.flatten.uniq.reject{|radical| radical.ambiguous || radical.is_synonym || Radical.first_screen_radicals.include?(radical) }
        
-      unless Rails.env == "production"
+      unless Rails.env == "production" && radicals.count <= 20
         puts "\n\n\n" + first_radical.simplified + " " + radicals.count.to_s + " unique second radicals that don't occur in the first screen"
         puts ""
       end
@@ -205,7 +205,7 @@ namespace :organize do
       frequency = radical_frequency[1]
       if frequency > 0
         radical.update(third_screen: true, third_screen_frequency: frequency)
-        unless Rails.env == "production" 
+        unless Rails.env == "production" && frequency <= 20
           puts "#{radical} #{ radical.third_screen_frequency }"
         end
       end
@@ -228,18 +228,6 @@ namespace :organize do
   end
   
   task :report => :environment do
-    @characters = []
-    
-    # matched_characters_1 = Radical.first_screen_plus_one_radical_character_matches(true)
-    # 
-    # matched_characters_2 = Radical.second_screen_plus_one_radical_character_matches(true)
-    #     
-    # matched_characters_3 = Radical.third_screen_character_matches(true)
-    # 
-    # matched_characters_4 = Character.where(fourth_screen: true)
-    #     
-    # matched_characters = [matched_characters_1, matched_characters_2, matched_characters_3, matched_characters_4].flatten.uniq
-
     matched_characters = Character.where("first_screen = ? OR second_screen = ? OR third_screen = ? OR fourth_screen = ?", true, true, true, true)
 
 
