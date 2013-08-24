@@ -27,8 +27,8 @@ namespace :organize do
     wang_mu.first.update synonyms: [wang_mu.last.id]
     wang_mu.last.update is_synonym: true
     
-    # Radical.make_synonyms("土", ["士"])
-    # Radical.make_synonyms("口", ["囗"])
+    Radical.make_synonyms("土", ["士"])
+    Radical.make_synonyms("口", ["囗"])
     Radical.make_synonyms("厂", ["广", "疒"])
     Radical.make_synonyms("𠃌", ["勹", "刀", "力"])
     Radical.make_synonyms("冂", %w(风 用 禸 肉 雨))
@@ -45,15 +45,17 @@ namespace :organize do
   
   desc "Mark confusing characters (for toolips)"
   task :confuse => :environment do
-    Radical.find_by(simplified: "土").update do_not_confuse: [Radical.find_by(simplified: "士").id]
-    Radical.find_by(simplified: "士").update do_not_confuse: [Radical.find_by(simplified: "土").id]
-    Radical.find_by(simplified: "口").update do_not_confuse: [Radical.find_by(simplified: "囗").id]
-    Radical.find_by(simplified: "囗").update do_not_confuse: [Radical.find_by(simplified: "口").id]
+    # Radical.find_by(simplified: "土").update do_not_confuse: [Radical.find_by(simplified: "士").id]
+    # Radical.find_by(simplified: "士").update do_not_confuse: [Radical.find_by(simplified: "土").id]
+    # Radical.find_by(simplified: "口").update do_not_confuse: [Radical.find_by(simplified: "囗").id]
+    # Radical.find_by(simplified: "囗").update do_not_confuse: [Radical.find_by(simplified: "口").id]
   end
 
   desc "First Screen"
   task :first_screen => :environment do
-    @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
+    # @radicals = %w(人 亻 土 日 月 木 艹 讠 宀 又 禾 十 亠 口 田 氵 丷 扌 大 厶)
+    @radicals = %w(人 亻 日 月 木 艹 辶 讠 宀 亠 又 禾 十 田 氵 丷 扌 大 厶 冂)
+    
     Radical.all.each do |radical|
       radical.update(first_screen: @radicals.include?(radical.simplified), frequency: radical.with_synonym_characters.count)
     end
