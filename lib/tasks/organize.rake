@@ -35,12 +35,19 @@ namespace :organize do
     Radical.make_synonyms("王", %w(玉))
     Radical.make_synonyms("冖", %w(宀))
     Radical.make_synonyms("夂", %w(夊))
-    # Radical.make_synonyms("又", %w(殳))
+    Radical.make_synonyms("又", %w(殳))
+    Radical.make_synonyms("月", %w(⺼ 骨))
     Radical.make_synonyms("匕", %w(比))
     Radical.make_synonyms("毌", %w(毌))
     Radical.make_synonyms("肀", %w(聿))
     Radical.make_synonyms("夕", %w(舛))
     Radical.make_synonyms("巳", %w(色 己 已 邑))
+    Radical.make_synonyms("贝", %w(见))
+    Radical.make_synonyms("尸", %w(户 戶))
+    Radical.make_synonyms("亻", %w(隹))
+    Radical.make_synonyms("夕", %w(歹))
+    Radical.make_synonyms("厶", %w(镸))
+    
   end
   
   desc "Mark confusing characters (for toolips)"
