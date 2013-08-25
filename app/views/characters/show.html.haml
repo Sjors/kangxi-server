@@ -8,7 +8,8 @@
 %ul.radicals
   - @character.words.sort_by{|w| w.simplified.length }.each do |word|
     %li{style: "margin-top: 10px;"}
-      = word.forvo_audio_html 
+      - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
+        = word.forvo_audio_html 
       %span.chinese
         = link_to word.simplified, word.wiktionary_url
       = word.pinyin + ": "
