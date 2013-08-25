@@ -40,10 +40,10 @@ namespace :import do
   
   desc "Import more words for characters"
   task :extra_words => :environment do
-    Character.all.includes(:radicals).where("radicals.id IS NOT NULL").order("id asc").each do |character|
+    Character.all.order("id asc").each do |character|
       puts "#{ (character.id.to_f / Character.count.to_f * 100.0 ).round }%..." if character.id % 100 == 0
       Zidian.find(character.simplified).each do |entry|
-        if character.words.count < 10 && entry.english.count > 0
+        if character.words.count < 10 && entry.english.count > 0 && entry.simplified.split(//).count <= 4
           word = Word.find_or_create_by(simplified: entry.simplified)
           unless character.words.include?(word)
             character.words << word
