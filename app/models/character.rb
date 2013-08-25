@@ -6,6 +6,8 @@ class Character < ActiveRecord::Base
   validates :level, :inclusion => 1..6 
   
   has_and_belongs_to_many :radicals
+  has_and_belongs_to_many :words
+  
   
   self.per_page = 100
   

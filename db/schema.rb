@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130822161306) do
+ActiveRecord::Schema.define(version: 20130825121529) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,14 @@ ActiveRecord::Schema.define(version: 20130822161306) do
 
   add_index "characters_radicals", ["character_id"], name: "index_characters_radicals_on_character_id", using: :btree
   add_index "characters_radicals", ["radical_id"], name: "index_characters_radicals_on_radical_id", using: :btree
+
+  create_table "characters_words", force: true do |t|
+    t.integer "character_id"
+    t.integer "word_id"
+  end
+
+  add_index "characters_words", ["character_id"], name: "index_characters_words_on_character_id", using: :btree
+  add_index "characters_words", ["word_id"], name: "index_characters_words_on_word_id", using: :btree
 
   create_table "radicals", force: true do |t|
     t.integer  "position"
@@ -77,5 +85,12 @@ ActiveRecord::Schema.define(version: 20130822161306) do
 
   add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "words", force: true do |t|
+    t.string   "simplified"
+    t.string   "english",    default: [], array: true
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
 end

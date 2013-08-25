@@ -2,8 +2,18 @@
   = @character.simplified
 %br
 = @character.pinyin
-= ("(" + link_to("Wiktionary",  "http://en.wiktionary.org/wiki/#{@character.simplified}#Mandarin") + ")").html_safe
+= ("(" + link_to("Wiktionary", @character.wiktionary_url) + ")").html_safe
 
+%hr
+%ul.radicals
+  - @character.words.sort_by{|w| w.simplified.length }.each do |word|
+    %li{style: "margin-top: 10px;"}
+      = word.forvo_audio_html 
+      %span.chinese
+        = link_to word.simplified, word.wiktionary_url
+      = word.pinyin + ": "
+      = word.english.join("; ")
+      
 %hr
 - if can? :edit, @character
   = link_to 'Edit', edit_character_path(@character)
@@ -14,6 +24,9 @@
   = render "rationale"
 - if can? :edit, @character
   = render "radicals/add_to_character", :character => @character
+%p
+  %a{:href => "http://www.forvo.com/", :title => "Pronunciations by Forvo"}
+    %img{:alt => "Pronunciations by Forvo", :height => "40", :src => "http://api.forvo.com/byforvoblue.gif", :style => "border:0", :width => "120"}
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
     mixpanel.track("Character", {"character": "#{@character.simplified}"});
