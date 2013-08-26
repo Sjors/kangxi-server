@@ -20,6 +20,7 @@ KangxiRadicals::Application.routes.draw do
   get 'lookup/more/more' => 'lookup#index_more_more', :as => 'more_more_radicals'
   get 'lookup/more/more/characters' => 'lookup#index_more_more_characters', :as => 'more_more_radicals_characters'
   
+  get 'words/:id/pronunciation.mp3' => 'words#pronunciation',  :as => 'word_pronunciation'
   
   root :to => 'lookup#index'
   

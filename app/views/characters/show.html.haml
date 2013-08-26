@@ -9,7 +9,7 @@
   - @character.words.sort_by{|w| w.simplified.length }.each do |word|
     %li{style: "margin-top: 10px;"}
       - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
-        = word.forvo_audio_html 
+        = "<audio controls preload='none'><source src='#{ word_pronunciation_path(word) }' type='audio/mpeg'></audio>".html_safe
       %span.chinese
         = link_to word.simplified, word.wiktionary_url
       = word.pinyin + ": "

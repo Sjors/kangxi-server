@@ -18,6 +18,7 @@ gem 'devise', "~> 3.0.0"
 gem 'cancan'
 gem 'will_paginate'
 gem 'zidian', :git => 'git://github.com/Sjors/zidian.git'
+gem 'exception_notification'
 
 group :test do
   gem 'guard-bundler'

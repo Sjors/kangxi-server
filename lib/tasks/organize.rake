@@ -52,6 +52,7 @@ namespace :organize do
   
   desc "Mark confusing characters (for toolips)"
   task :confuse => :environment do
+    Radical.update_all do_not_confuse: []
     # Radical.find_by(simplified: "土").update do_not_confuse: [Radical.find_by(simplified: "士").id]
     # Radical.find_by(simplified: "士").update do_not_confuse: [Radical.find_by(simplified: "土").id]
     # Radical.find_by(simplified: "口").update do_not_confuse: [Radical.find_by(simplified: "囗").id]
