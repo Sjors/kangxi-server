@@ -156,9 +156,9 @@ class Radical < ActiveRecord::Base
   
   def self.export_screen_1_and_2_radicals(screen, f)
     if screen == 1
-      @radicals = self.where(first_screen: true).to_a.slice(0,2) # DEBUG
+      @radicals = self.where(first_screen: true).to_a #.slice(0,2) # DEBUG
     else
-      @radicals = self.where(second_screen: true).to_a.slice(0,2) # DEBUG
+      @radicals = self.where(second_screen: true).to_a #.slice(0,2) # DEBUG
     end
     
     @radicals.each_index do |i|
@@ -190,11 +190,13 @@ class Radical < ActiveRecord::Base
           @characters << first_radical.with_synonym_characters.keep_if{|character| character.has_radicals(first_radical, second_radical)}
         end
     
-        @characters.flatten!.uniq!.to_a.slice(0,35)
-
-        f << "  r2 = r;";
-        self.export_characters(f, @characters, first_radical)
+        @characters.flatten!
         
+        unless @characters.nil? 
+          @characters.uniq!.to_a.slice(0,35)
+          f << "  r2 = r;";
+          self.export_characters(f, @characters, first_radical)
+        end
 
       end
 
