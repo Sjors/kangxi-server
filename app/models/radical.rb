@@ -153,4 +153,147 @@ class Radical < ActiveRecord::Base
       s.update is_synonym: true
     end
   end
+  
+  def self.export_screen_1_and_2_radicals(screen, f)
+    if screen == 1
+      @radicals = self.where(first_screen: true).to_a.slice(0,2) # DEBUG
+    else
+      @radicals = self.where(second_screen: true).to_a.slice(0,2) # DEBUG
+    end
+    
+    @radicals.each_index do |i|
+      first_radical = @radicals[i]
+      puts "#{ first_radical }..."
+      f << "  NSLog(@\"#{ first_radical }...\");\n"
+      f << "  r = [NSEntityDescription insertNewObjectForEntityForName:kEntityRadical\n"  
+      f << "               inManagedObjectContext:managedObjectContext];\n"
+      f << "  r.isFirstRadical = @YES;\n"
+      f << "  r.simplified = @\"#{ first_radical.simplified }\";\n"
+      f << "  r.position = [NSNumber numberWithInt:#{ i }];\n"
+      f << "  r.section = @#{ screen - 1 };\n"  
+      f << "\n"
+      primary_second_radicals = Radical.where("id in (?)", @radicals[i].radicals).to_a #.slice(0,5) # DEBUG
+      self.export_second_radicals(primary_second_radicals, f, false, screen, :primary, first_radical)
+
+      # Only first screen:
+      if screen  == 1
+        # These aren't on the second screen, because there just aren't enough to make it worth it.
+        secondary_second_radicals = Radical.where("id in (?)", @radicals[i].secondary_radicals).to_a #.slice(0,5) # DEBUG
+        self.export_second_radicals(secondary_second_radicals, f, false, 1, :secondary,first_radical)
+        
+       
+        tertiary_second_radicals = Radical.where("id in (?)", @radicals[i].tertiary_radicals).to_a #.slice(0,5) # DEBUG
+        # These are displayed as characters:
+        @characters = []
+    
+        tertiary_second_radicals.each do |second_radical|      
+          @characters << first_radical.with_synonym_characters.keep_if{|character| character.has_radicals(first_radical, second_radical)}
+        end
+    
+        @characters.flatten!.uniq!.to_a.slice(0,35)
+
+        f << "  r2 = r;";
+        self.export_characters(f, @characters, first_radical)
+        
+
+      end
+
+      self.export_save_context(f)
+    end
+    
+  end
+  
+  def self.export_save_context(f)
+    f << "\n"
+    f << "  error = nil;\n"
+    f << "  [managedObjectContext save:&error];\n"
+    f << "  if(error != nil) { NSLog(@\"%@\", error); }"
+    f << "\n\n"
+  end
+  
+  def self.export_screen_3_radicals(f)
+    radicals = self.where(third_screen: true).to_a #.slice(0,2) # DEBUG
+    self.export_second_radicals(radicals, f, true, 3, :primary, nil)
+    self.export_save_context(f)
+  end
+  
+  def self.export_screen_4_radicals(f)
+    self.export_characters(f, Character.where(fourth_screen: true), nil)
+    self.export_save_context(f)
+  end
+  
+  def self.export_second_radicals(second_radicals, f, without_first_radical, screen, primary_secondary, first_radical)
+    pmt = 1 if primary_secondary == :primary
+    pmt = 2 if primary_secondary == :secondary
+        
+    second_radicals.each_index do |j|
+      second_radical = second_radicals[j]
+      f << "  r2 = [NSEntityDescription insertNewObjectForEntityForName:kEntityRadical\n"  
+      f << "               inManagedObjectContext:managedObjectContext];\n"
+      f << "  r2.isFirstRadical = @NO;\n"
+      
+      if without_first_radical
+        f << "  r2.section = @2;\n"  
+      else
+        f << "  r2.firstRadical = r;\n"
+        f << "  r2.section = @#{ pmt - 1 };\n"  
+      end
+      f << "  r2.simplified = @\"#{ second_radical.simplified }\";\n"
+      f << "  r2.position = [NSNumber numberWithInt:#{ j }];\n"
+      if screen == 1
+        @characters = first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(first_radical, second_radical)}
+      elsif screen == 2
+        @characters = first_radical.with_synonym_characters.where(second_screen: true).keep_if{|c| c.has_radicals(first_radical, second_radical)}
+      elsif screen == 3
+        @characters = second_radical.with_synonym_characters.where(third_screen: true).to_a
+      end
+    
+      self.export_characters(f, @characters, second_radical)
+    end
+  end
+  
+  def self.export_characters(f, characters, second_radical)
+    f << "  cTally = 0;\n"
+    f << "  for(NSArray *character_words in @[\n" 
+    character_count = characters.count
+    characters.each_index do |k| 
+      character = characters[k]
+      f << "    @["
+      f << "@\"#{ character.simplified }\", "
+      f << "@[" + character.words.collect{|w| "@[@\"#{ w.simplified }\", @\"#{ w.english.collect{| e | e.gsub("\"","\\\"")}.join('; ') }\"]" }.join(", ") + "]"
+      if k <= character_count - 2
+        f << "],\n"
+      else
+        f << "]\n"
+      end
+    end
+    f << "  ]) {\n"
+    f << "    Character* c;\n"
+    f << "    NSString *character = [character_words firstObject];\n"
+    f << "    c = [Character fetchBySimplified:character inManagedObjectContext:managedObjectContext];\n"
+    f << "    if( c==nil ) {\n"
+    f << "      c = [NSEntityDescription insertNewObjectForEntityForName:kEntityCharacter inManagedObjectContext:managedObjectContext];\n"
+    f << "      c.simplified = character;\n"
+    f << "      c.position = [NSNumber numberWithInt:cTally];\n"
+    f << "      int wTally = 0;\n"
+    f << "      for(NSArray *simplified_english in [character_words lastObject]) {\n"
+    f << "        Word* w;\n"
+    f << "        w = [Word fetchBySimplified:[simplified_english firstObject] inManagedObjectContext:managedObjectContext];\n"
+    f << "        if( w==nil ) {\n"
+    f << "          w = [NSEntityDescription insertNewObjectForEntityForName:kEntityWord inManagedObjectContext:managedObjectContext];\n"
+    f << "          w.simplified = [simplified_english firstObject];\n"
+    f << "          w.english = [simplified_english lastObject];\n"
+    f << "          w.wordLength = [NSNumber numberWithInt:[w.simplified length]];\n" 
+    f << "        }\n"
+    f << "        [w addCharactersObject:c];\n"
+    f << "        wTally++;\n"
+    f << "      }\n"
+    f << "    }\n"
+    if second_radical.present?
+      f << "    [c addSecondRadicalsObject:r2];\n"
+    end
+    f << "  }\n"
+    f << "\n"
+  end
+  
 end
