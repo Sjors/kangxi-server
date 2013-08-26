@@ -77,3 +77,4 @@ pickle-email-*.html
 # Ignore application configuration
 /config/application.yml
 100-most-common-radicals.txt
+lib/assets/HSK_Level_6.csv
