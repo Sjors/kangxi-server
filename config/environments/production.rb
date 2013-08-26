@@ -94,6 +94,6 @@ end
 KangxiRadicals::Application.config.middleware.use ExceptionNotification::Rack,
   :email => {
     :email_prefix => "[Kangxi] ",
-    :sender_address => %{"notifier" <notifier@kangxiradicals.com>},
+    :sender_address => %{"Kangxi Notifier" <notifier@kangxiradicals.com>},
     :exception_recipients => %w{exception@kangxiradicals.com}
   }

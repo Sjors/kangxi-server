@@ -109,7 +109,7 @@ class Radical < ActiveRecord::Base
       tips << "Also " + Radical.where("id in (?)", self.synonyms).collect{|r| r.to_s}.join(" ")
     end
     
-    if self.do_not_confuse.length > 0
+    if self.do_not_confuse && self.do_not_confuse.length > 0
       tips << "Not " + Radical.where("id in (?)", self.do_not_confuse).collect{|r| r.to_s}.join(" ")
     end
     
