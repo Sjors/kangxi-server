@@ -13,6 +13,17 @@ class Character < ActiveRecord::Base
   
   # default_scope -> { order("level asc, characters.id asc") }
   
+  def rank
+    scores = self.radicals.where(ambiguous: false).order(position: :desc).collect{|r| r.position}.slice(0,3)
+    
+    tally = 0
+    tally = tally + scores[0] * 1000000 if scores.count >= 1
+    tally = tally + scores[1] * 1000 if scores.count >= 2
+    tally = tally + scores[2] if scores.count >= 3
+    
+    return tally
+  end
+  
   def remove_radical(radical, count = 1)
     current_radical_count = self.radicals.where(id: radical.id).count
     self.radicals.delete(radical)

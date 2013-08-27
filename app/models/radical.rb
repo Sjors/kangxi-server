@@ -8,6 +8,16 @@ class Radical < ActiveRecord::Base
 
   has_and_belongs_to_many :characters
   
+  def rank
+    tally = self.position * 10
+    
+    if self.variant
+      tally = tally + Radical.where(position: self.position).order(variant: :asc).collect{|v| v.id}.find_index(self.id)
+    end
+    
+    return tally
+  end
+  
   def currently_unmatched_characters 
     self.characters.where("characters.id not in (?)", Character.unmatched_by_first_screen_ids ).references(:character)
   end
@@ -161,28 +171,28 @@ class Radical < ActiveRecord::Base
       @radicals = self.where(second_screen: true).to_a #.slice(0,2) # DEBUG
     end
     
-    @radicals.each_index do |i|
-      first_radical = @radicals[i]
+    @radicals.each do |first_radical|
+      f << "@autoreleasepool {\n"
       puts "#{ first_radical }..."
       f << "  NSLog(@\"#{ first_radical }...\");\n"
       f << "  r = [NSEntityDescription insertNewObjectForEntityForName:kEntityRadical\n"  
       f << "               inManagedObjectContext:managedObjectContext];\n"
       f << "  r.isFirstRadical = @YES;\n"
       f << "  r.simplified = @\"#{ first_radical.simplified }\";\n"
-      f << "  r.position = [NSNumber numberWithInt:#{ i }];\n"
+      f << "  r.rank = @#{ first_radical.rank };\n"
       f << "  r.section = @#{ screen - 1 };\n"  
       f << "\n"
-      primary_second_radicals = Radical.where("id in (?)", @radicals[i].radicals).to_a #.slice(0,5) # DEBUG
+      primary_second_radicals = Radical.where("id in (?)", first_radical.radicals).to_a #.slice(0,5) # DEBUG
       self.export_second_radicals(primary_second_radicals, f, false, screen, :primary, first_radical)
 
       # Only first screen:
       if screen  == 1
         # These aren't on the second screen, because there just aren't enough to make it worth it.
-        secondary_second_radicals = Radical.where("id in (?)", @radicals[i].secondary_radicals).to_a #.slice(0,5) # DEBUG
+        secondary_second_radicals = Radical.where("id in (?)", first_radical.secondary_radicals).to_a #.slice(0,5) # DEBUG
         self.export_second_radicals(secondary_second_radicals, f, false, 1, :secondary,first_radical)
         
        
-        tertiary_second_radicals = Radical.where("id in (?)", @radicals[i].tertiary_radicals).to_a #.slice(0,5) # DEBUG
+        tertiary_second_radicals = Radical.where("id in (?)", first_radical.tertiary_radicals).to_a #.slice(0,5) # DEBUG
         # These are displayed as characters:
         @characters = []
     
@@ -201,15 +211,19 @@ class Radical < ActiveRecord::Base
       end
 
       self.export_save_context(f)
+      f << "}\n" # End of auto release pool
     end
     
   end
   
   def self.export_save_context(f)
     f << "\n"
+    f << "  r = nil;\n"
+    f << "  r2 = nil;\n"
     f << "  error = nil;\n"
     f << "  [managedObjectContext save:&error];\n"
-    f << "  if(error != nil) { NSLog(@\"%@\", error); }"
+    f << "  if(error != nil) { NSLog(@\"%@\", error); abort();}\n"
+    f << "  [managedObjectContext reset];\n"
     f << "\n\n"
   end
   
@@ -228,8 +242,7 @@ class Radical < ActiveRecord::Base
     pmt = 1 if primary_secondary == :primary
     pmt = 2 if primary_secondary == :secondary
         
-    second_radicals.each_index do |j|
-      second_radical = second_radicals[j]
+    second_radicals.each do |second_radical|
       f << "  r2 = [NSEntityDescription insertNewObjectForEntityForName:kEntityRadical\n"  
       f << "               inManagedObjectContext:managedObjectContext];\n"
       f << "  r2.isFirstRadical = @NO;\n"
@@ -241,7 +254,7 @@ class Radical < ActiveRecord::Base
         f << "  r2.section = @#{ pmt - 1 };\n"  
       end
       f << "  r2.simplified = @\"#{ second_radical.simplified }\";\n"
-      f << "  r2.position = [NSNumber numberWithInt:#{ j }];\n"
+      f << "  r2.rank = @#{ second_radical.rank };\n"
       if screen == 1
         @characters = first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(first_radical, second_radical)}
       elsif screen == 2
@@ -255,13 +268,12 @@ class Radical < ActiveRecord::Base
   end
   
   def self.export_characters(f, characters, second_radical)
-    f << "  cTally = 0;\n"
     f << "  for(NSArray *character_words in @[\n" 
     character_count = characters.count
     characters.each_index do |k| 
       character = characters[k]
       f << "    @["
-      f << "@\"#{ character.simplified }\", "
+      f << "@[@\"#{ character.simplified }\", @#{ character.rank }], "
       f << "@[" + character.words.collect{|w| "@[@\"#{ w.simplified }\", @\"#{ w.english.collect{| e | e.gsub("\"","\\\"")}.join('; ') }\"]" }.join(", ") + "]"
       if k <= character_count - 2
         f << "],\n"
@@ -271,16 +283,15 @@ class Radical < ActiveRecord::Base
     end
     f << "  ]) {\n"
     f << "    Character* c;\n"
-    f << "    NSString *character = [character_words firstObject];\n"
-    f << "    c = [Character fetchBySimplified:character inManagedObjectContext:managedObjectContext];\n"
+    f << "    NSArray *character = [character_words firstObject];\n"
+    f << "    c = [Character fetchBySimplified:[character firstObject] inManagedObjectContext:managedObjectContext includesPropertyValuesAndSubentities:NO];\n"
     f << "    if( c==nil ) {\n"
     f << "      c = [NSEntityDescription insertNewObjectForEntityForName:kEntityCharacter inManagedObjectContext:managedObjectContext];\n"
-    f << "      c.simplified = character;\n"
-    f << "      c.position = [NSNumber numberWithInt:cTally];\n"
-    f << "      int wTally = 0;\n"
+    f << "      c.simplified = [character firstObject];\n"
+    f << "      c.rank = [character lastObject];\n"
     f << "      for(NSArray *simplified_english in [character_words lastObject]) {\n"
     f << "        Word* w;\n"
-    f << "        w = [Word fetchBySimplified:[simplified_english firstObject] inManagedObjectContext:managedObjectContext];\n"
+    f << "        w = [Word fetchBySimplified:[simplified_english firstObject] inManagedObjectContext:managedObjectContext includesPropertyValuesAndSubentities:NO];\n"
     f << "        if( w==nil ) {\n"
     f << "          w = [NSEntityDescription insertNewObjectForEntityForName:kEntityWord inManagedObjectContext:managedObjectContext];\n"
     f << "          w.simplified = [simplified_english firstObject];\n"
@@ -288,7 +299,6 @@ class Radical < ActiveRecord::Base
     f << "          w.wordLength = [NSNumber numberWithInt:[w.simplified length]];\n" 
     f << "        }\n"
     f << "        [w addCharactersObject:c];\n"
-    f << "        wTally++;\n"
     f << "      }\n"
     f << "    }\n"
     if second_radical.present?

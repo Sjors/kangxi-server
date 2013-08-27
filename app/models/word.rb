@@ -24,6 +24,6 @@ class Word < ActiveRecord::Base
   end
   
   def self.english_given_zidian_entry(zidian)
-    zidian.english.slice(0,3).collect{|meaning| meaning.slice(0,25)}
+    zidian.english.slice(0,3).collect{|meaning| meaning.slice(0,100)}
   end
 end

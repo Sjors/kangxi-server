@@ -21,7 +21,6 @@ namespace :export do
       f << "  NSError *error;\n"
       f << "  Radical* r;\n"
       f << "  Radical* r2;\n"
-      f << "  int cTally;\n"
     
       puts "Screen 1..."
       f << "//*********** \n"

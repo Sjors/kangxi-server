@@ -1,6 +1,9 @@
 require 'csv'
 require 'open-uri'
 namespace :import do 
+  task :words => [:delete_words, :hsk_words, :extra_words]
+  
+  
   desc "Import HSK characters level 2 through 6"
   task :hsk2_6 => :environment do 
     # csv_text = File.read('hsk6.csv')
