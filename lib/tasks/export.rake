@@ -9,6 +9,7 @@ namespace :export do
       f << "\n"
       f << "@interface Populator : NSObject\n"
       f << "+(void)import:(NSManagedObjectContext *)managedObjectContext;\n"
+      f << "+(void)synonyms:(NSManagedObjectContext *)managedObjectContext;\n"
       f << "@end\n"
     end
     
@@ -51,6 +52,14 @@ namespace :export do
       Radical.export_screen_4_radicals(f)
       
       f << "}\n"
+      
+      puts "Synonyms..."
+      f << "//*********** \n"
+      f << "// Synonyms * \n" 
+      f << "//*********** \n"
+      
+      Radical.export_synonyms(f)
+      
       f << "@end\n"
     end
   end

@@ -166,7 +166,7 @@ class Radical < ActiveRecord::Base
   
   def self.export_screen_1_and_2_radicals(screen, f)
     if screen == 1
-      @radicals = self.where(first_screen: true).to_a #.slice(0,2) # DEBUG
+      @radicals = self.where(first_screen: true).to_a #.slice(0,1) # DEBUG
     else
       @radicals = self.where(second_screen: true).to_a #.slice(0,2) # DEBUG
     end
@@ -306,6 +306,26 @@ class Radical < ActiveRecord::Base
     end
     f << "  }\n"
     f << "\n"
+  end
+  
+  def self.export_synonyms(f)
+    f << "+(void)synonyms:(NSManagedObjectContext *)managedObjectContext {\n"
+    f << "  NSLog(@\"Synonyms\");\n"
+    f << "  for(Radical *radical in [Radical all:managedObjectContext]) {\n"
+    Radical.all.each do |r|
+      if r.synonyms.count > 0
+        f << "    if ([radical.simplified isEqualToString:@\"#{ r.simplified }\"]) {\n"
+        f << "      radical.synonyms = @\"#{ Radical.where("id in (?)", r.synonyms).collect{| s | s.simplified}.join(" ") }\";\n"
+        f << "    }\n"
+      end
+    end
+    f << "  }\n"
+    f << "                                  \n"
+    f << "  NSError *error;\n"
+    f << "  [managedObjectContext save:&error];\n"
+    f << "  if(error) { NSLog(@\"%@\",error); abort();}\n"
+    f << "}\n"
+    
   end
   
 end
