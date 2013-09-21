@@ -57,6 +57,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.6.3)
+    dalli (2.6.4)
     debug_inspector (0.0.2)
     devise (3.0.0)
       bcrypt-ruby (~> 3.0)
@@ -120,6 +121,7 @@ GEM
     jquery-rails (3.0.4)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
+    kgio (2.8.0)
     listen (1.2.2)
       rb-fsevent (>= 0.9.3)
       rb-inotify (>= 0.9)
@@ -128,6 +130,7 @@ GEM
     mail (2.5.4)
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
+    memcachier (0.0.2)
     method_source (0.8.2)
     mime-types (1.23)
     mini_portile (0.5.1)
@@ -246,6 +249,7 @@ DEPENDENCIES
   cancan
   capybara
   coffee-rails (~> 4.0.0)
+  dalli
   devise (~> 3.0.0)
   exception_notification
   factory_girl_rails
@@ -258,6 +262,8 @@ DEPENDENCIES
   html2haml
   jbuilder (~> 1.2)
   jquery-rails
+  kgio
+  memcachier
   pg
   phantomjs
   poltergeist

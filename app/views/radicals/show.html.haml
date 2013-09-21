@@ -1,41 +1,42 @@
-%h1.chinese
-  = @radical.simplified
-%br
-%p
-  %b 
-    Kangxi Radical
-    = @radical.position
-  = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }") + ")").html_safe
+- cache(["v1", @radical.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
+  %h1.chinese
+    = @radical.simplified
   %br
-  = @radical.pinyin
+  %p
+    %b 
+      Kangxi Radical
+      = @radical.position
+    = ("(" + link_to("Wikipedia",  "http://en.wikipedia.org/wiki/Radical_#{ @radical.position }") + ")").html_safe
+    %br
+    = @radical.pinyin
   
-%p
-  %b 
-    - if @radical.variant
-      Variant of
-      - original = Radical.where(position: @radical.position, variant: false).first
-      %span.chinese
-        = link_to original.simplified, original
-    - else 
-      - variants = Radical.where(position: @radical.position, variant: true)
-      - unless variants.count == 0
-        Variants: 
+  %p
+    %b 
+      - if @radical.variant
+        Variant of
+        - original = Radical.where(position: @radical.position, variant: false).first
         %span.chinese
-          - variants.each do |variant|
-            = link_to variant.simplified, variant
+          = link_to original.simplified, original
+      - else 
+        - variants = Radical.where(position: @radical.position, variant: true)
+        - unless variants.count == 0
+          Variants: 
+          %span.chinese
+            - variants.each do |variant|
+              = link_to variant.simplified, variant
 
-%br
-= @radical.note
+  %br
+  = @radical.note
 
-%hr
-%h3 Characters
-= render "characters/list", :characters => @radical.characters.uniq
+  %hr
+  %h3 Characters
+  = render "characters/list", :characters => @radical.characters.uniq
 
-- if can? :edit, @radical
-  = link_to 'Edit', edit_radical_path(@radical)
-  \|
-  = link_to 'Destroy', radical_path(@radical), :method => :delete, :confirm => "Are you sure?"
+  - if can? :edit, @radical
+    = link_to 'Edit', edit_radical_path(@radical)
+    \|
+    = link_to 'Destroy', radical_path(@radical), :method => :delete, :confirm => "Are you sure?"
 
-- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
-  :javascript
-    mixpanel.track("Radical", {"radical": "#{@radical.simplified}"});
+  - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+    :javascript
+      mixpanel.track("Radical", {"radical": "#{@radical.simplified}"});

@@ -1,33 +1,34 @@
-%h1.chinese
-  = @character.simplified
-%br
-= @character.pinyin
-= ("(" + link_to("Wiktionary", @character.wiktionary_url) + ")").html_safe
+- cache(["v1", @character.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
+  %h1.chinese
+    = @character.simplified
+  %br
+  = @character.pinyin
+  = ("(" + link_to("Wiktionary", @character.wiktionary_url) + ")").html_safe
 
-%hr
-%ul.radicals
-  - @character.words.sort_by{|w| w.simplified.length }.each do |word|
-    %li{style: "margin-top: 10px;"}
-      - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
-        = "<audio controls preload='none'><source src='#{ word_pronunciation_path(word) }' type='audio/mpeg'></audio>".html_safe
-      %span.chinese
-        = link_to word.simplified, word.wiktionary_url
-      = word.pinyin + ": "
-      = word.english.join("; ")
+  %hr
+  %ul.radicals
+    - @character.words.sort_by{|w| w.simplified.length }.each do |word|
+      %li{style: "margin-top: 10px;"}
+        - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
+          = "<audio controls preload='none'><source src='#{ word_pronunciation_path(word) }' type='audio/mpeg'></audio>".html_safe
+        %span.chinese
+          = link_to word.simplified, word.wiktionary_url
+        = word.pinyin + ": "
+        = word.english.join("; ")
       
-%hr
-- if can? :edit, @character
-  = link_to 'Edit', edit_character_path(@character)
-%hr
-%h3 Radicals
-= render "radicals/list", :radicals => @character.radicals
-- unless user_signed_in?
-  = render "rationale"
-- if can? :edit, @character
-  = render "radicals/add_to_character", :character => @character
-%p
-  %a{:href => "http://www.forvo.com/", :title => "Pronunciations by Forvo"}
-    %img{:alt => "Pronunciations by Forvo", :height => "40", :src => "http://api.forvo.com/byforvoblue.gif", :style => "border:0", :width => "120"}
-- if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
-  :javascript
-    mixpanel.track("Character", {"character": "#{@character.simplified}"});
+  %hr
+  - if can? :edit, @character
+    = link_to 'Edit', edit_character_path(@character)
+  %hr
+  %h3 Radicals
+  = render "radicals/list", :radicals => @character.radicals
+  - unless user_signed_in?
+    = render "rationale"
+  - if can? :edit, @character
+    = render "radicals/add_to_character", :character => @character
+  %p
+    %a{:href => "http://www.forvo.com/", :title => "Pronunciations by Forvo"}
+      %img{:alt => "Pronunciations by Forvo", :height => "40", :src => "http://api.forvo.com/byforvoblue.gif", :style => "border:0", :width => "120"}
+  - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
+    :javascript
+      mixpanel.track("Character", {"character": "#{@character.simplified}"});

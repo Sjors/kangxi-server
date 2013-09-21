@@ -46,4 +46,8 @@ end
 
 group :production do
   gem 'rails_12factor'
+  # Caching:
+  gem 'kgio'
+  gem 'dalli'
+  gem 'memcachier'
 end

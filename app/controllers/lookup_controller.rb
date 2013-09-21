@@ -34,24 +34,30 @@ class LookupController < ApplicationController
   
   def first_radical_more_characters
     @radical = Radical.find(params[:id])
-    @characters = []
     
-    Radical.where("id in (?)", @radical.tertiary_radicals).each do |second_radical|      
-      @characters << @radical.with_synonym_characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
-    end
+    @characters = Rails.cache.fetch(@radical.cache_key) {
+      chars = []
     
-    @characters.flatten!.uniq!.to_a.slice(0,35)
+      Radical.where("id in (?)", @radical.tertiary_radicals).each do |second_radical|      
+        chars << @radical.with_synonym_characters.keep_if{|character| character.has_radicals(@radical, second_radical)}
+      end
+    
+      chars.flatten.uniq.to_a.slice(0,35)
+    }
   end
   
   def second_radical
     @first_radical = Radical.find(params[:first_id])
     @second_radical = Radical.find(params[:second_id])
     
-    if @first_radical.first_screen
-      @characters = @first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
-    else # Second screen characters:
-      @characters = @first_radical.with_synonym_characters.where(second_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)} 
-    end
+    @characters = Rails.cache.fetch( "Characters" + @first_radical.cache_key + @second_radical.cache_key ) {
+      if @first_radical.first_screen
+        @first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)}
+      else # Second screen characters:
+        @first_radical.with_synonym_characters.where(second_screen: true).keep_if{|c| c.has_radicals(@first_radical, @second_radical)} 
+      end
+    }    
+
     
   end
 
