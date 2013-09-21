@@ -22,14 +22,15 @@
       mixpanel.init("205327faee0efccec16b37c2db34d98d");
   %body
     #wrap
-      %header.navbar.navbar-fixed-top
-        %nav.navbar-inner
-          %a.btn.btn-navbar(data-target=".nav-collapse" data-toggle="collapse")
-            %span.icon-bar
-            %span.icon-bar
-            %span.icon-bar
-          .container.nav-collapse
-            = render 'layouts/navigation'
+      - if user_signed_in? # Navbar gets in the way of smart banner and is confusing anyway
+        %header.navbar.navbar-fixed-top
+          %nav.navbar-inner
+            %a.btn.btn-navbar(data-target=".nav-collapse" data-toggle="collapse")
+              %span.icon-bar
+              %span.icon-bar
+              %span.icon-bar
+            .container.nav-collapse
+              = render 'layouts/navigation'
       %main{:role => "main"}
         .container
           .content
