@@ -7,4 +7,4 @@
   = render "characters"  
 - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
   :javascript
-    mixpanel.track("Lookup Radical 2", {"Radical 1": "#{@first_radical.simplified}", "Radical 2": "#{@second_radical.simplified}"});
+    mixpanel.track("Lookup Characters", {"Radical 1": "#{@first_radical.simplified}", "Radical 2": "#{@second_radical.simplified}"});

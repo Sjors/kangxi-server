@@ -313,7 +313,7 @@ class Radical < ActiveRecord::Base
     f << "  NSLog(@\"Synonyms\");\n"
     f << "  for(Radical *radical in [Radical all:managedObjectContext]) {\n"
     Radical.all.each do |r|
-      if r.synonyms.count > 0
+      if r.synonyms.count > 0 && r.simplified != "阝" && r.simplified != "罒"
         f << "    if ([radical.simplified isEqualToString:@\"#{ r.simplified }\"]) {\n"
         f << "      radical.synonyms = @\"#{ Radical.where("id in (?)", r.synonyms).collect{| s | s.simplified}.join(" ") }\";\n"
         f << "    }\n"
