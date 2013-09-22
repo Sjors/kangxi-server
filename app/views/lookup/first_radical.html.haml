@@ -15,12 +15,12 @@
 - if @radical.first_screen || @radical.second_screen           
   %p  
     Select a second radical.
-    - if @radical.simplified == "月"
-      E.g. if you're looking for 
-      %span.chinese 阴 
-      then click on 
-      = succeed '.' do
-        %span.chinese 阝
+    / - if @radical.simplified == "月"
+    /   E.g. if you're looking for 
+    /   %span.chinese 阴 
+    /   then click on 
+    /   = succeed '.' do
+    /     %span.chinese 阝
 - else
   Matching characters
 

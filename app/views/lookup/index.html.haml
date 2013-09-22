@@ -1,4 +1,4 @@
-- cache(["v1", @radicals.order("updated_at desc").first.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
+- cache(["v2", @radicals.order("updated_at desc").first.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
   %table.lookup
     = render "index", :number => 1
     %tr
@@ -7,11 +7,12 @@
   %h3
     1000 Chinese characters within 3 clicks.
   %p
-    Do you recognize any of the radicals above in the character which you are trying to identify? E.g. if you're looking for 
-    %span.chinese 阴 
-    then click on 
-    = succeed '.' do
-      %span.chinese 月
+    Do you recognize any of the radicals above in the character which you are trying to identify? 
+    / E.g. if you're looking for 
+    / %span.chinese 阴 
+    / then click on 
+    / = succeed '.' do
+    /   %span.chinese 月
 
   - if Rails.env == "production" && !(user_signed_in? && current_user.class.name == "Admin")
     :javascript
