@@ -71,10 +71,20 @@ class Character < ActiveRecord::Base
     return false
   end
   
+  def zidian_word_entries(max)
+    entries = Zidian.find(self.simplified)
+    entries.reject{|entry|
+      entry.english.count == 0                  ||
+      entry.simplified.split(//).count > 6      ||
+      entry.english.join.include?("variant of") ||
+      entry.english.join.include?("surname")    ||
+      !entry.simplified.split(//).include?(self.simplified)       
+    }.slice(0, max).sort{|a,b| a.simplified.length <=> b.simplified.length}    
+  end
+  
   def self.single_radicals
     # Radical.where("first_screen = ? OR second_screen = ?", true, true).collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }
     
     Radical.all.to_a.collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }.flatten.uniq
   end
-  
 end
