@@ -79,7 +79,7 @@ class Character < ActiveRecord::Base
       entry.english.join.include?("variant of") ||
       entry.english.join.include?("surname")    ||
       !entry.simplified.split(//).include?(self.simplified)       
-    }.slice(0, max).sort{|a,b| a.simplified.length <=> b.simplified.length}    
+    }.sort{|a,b| a.simplified.length <=> b.simplified.length}.slice(0, max)  
   end
   
   def self.single_radicals
