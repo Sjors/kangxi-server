@@ -26,4 +26,9 @@ class Word < ActiveRecord::Base
   def self.english_given_zidian_entry(zidian)
     zidian.english.slice(0,3).collect{|meaning| meaning.slice(0,100)}
   end
+  
+  def to_s
+    zidian = Zidian.find(self.simplified).first
+    Word.english_given_zidian_entry(zidian).first
+  end
 end

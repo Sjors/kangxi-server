@@ -1,20 +1,21 @@
-- cache(["v1", @character.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
+- cache(["v2", @character.cache_key, user_signed_in? ? current_user.cache_key : "Anonymous"]) do 
   %h1.chinese
     = @character.simplified
   %br
   = @character.pinyin
-  = ("(" + link_to("Wiktionary", @character.wiktionary_url) + ")").html_safe
-
-  %hr
-  %ul.radicals
-    - @character.words.sort_by{|w| w.simplified.length }.each do |word|
-      %li{style: "margin-top: 10px;"}
-        - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
-          = "<audio controls preload='none'><source src='#{ word_pronunciation_path(word) }' type='audio/mpeg'></audio>".html_safe
-        %span.chinese
-          = link_to word.simplified, word.wiktionary_url
-        = word.pinyin + ": "
-        = word.english.join("; ")
+  = ":" 
+  = link_to(@character.words.first, @character.wiktionary_url)
+  - unless user_signed_in?
+    %hr
+    %ul.radicals
+      - @character.words.sort_by{|w| w.simplified.length }.each do |word|
+        %li{style: "margin-top: 10px;"}
+          - unless request.env["HTTP_USER_AGENT"].match(/\(.*https?:\/\/.*\)/)
+            = "<audio controls preload='none'><source src='#{ word_pronunciation_path(word) }' type='audio/mpeg'></audio>".html_safe
+          %span.chinese
+            = link_to word.simplified, word.wiktionary_url
+          = word.pinyin + ": "
+          = word.english.join("; ")
       
   %hr
   - if can? :edit, @character

@@ -48,6 +48,7 @@ namespace :organize do
     Radical.make_synonyms("亻", %w(隹))
     Radical.make_synonyms("夕", %w(歹))
     Radical.make_synonyms("厶", %w(镸))
+    Radical.make_synonyms("臼", %w(鼠))
     
   end
   

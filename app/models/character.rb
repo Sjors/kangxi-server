@@ -5,7 +5,7 @@ class Character < ActiveRecord::Base
   validates_presence_of :level
   validates :level, :inclusion => 1..6 
   
-  has_and_belongs_to_many :radicals
+  has_and_belongs_to_many :radicals, :after_add => :touch_self, :after_remove => :touch_self
   has_and_belongs_to_many :words
   
   
@@ -86,5 +86,11 @@ class Character < ActiveRecord::Base
     # Radical.where("first_screen = ? OR second_screen = ?", true, true).collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }
     
     Radical.all.to_a.collect{|r| r.characters.keep_if{|c| c.radicals.count == 1} }.flatten.uniq
+  end
+  
+  private
+  
+  def touch_self(radical)
+    self.touch
   end
 end
