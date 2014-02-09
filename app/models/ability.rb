@@ -2,8 +2,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    can [:index, :show], Radical
-    can [:index, :show], Character
+
     
     can :new, Visitor
     

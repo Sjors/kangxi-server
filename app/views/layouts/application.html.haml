@@ -33,11 +33,8 @@
               = render 'layouts/navigation'
       %main{:role => "main"}
         .container
-          .content
-            .row
-              .span12
-                = render 'layouts/messages'
-                = yield
+          = render 'layouts/messages'
+          = yield
       #push
     #footer.do-not-print
       .container

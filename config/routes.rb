@@ -22,7 +22,7 @@ KangxiRadicals::Application.routes.draw do
   
   get 'words/:id/pronunciation.mp3' => 'words#pronunciation',  :as => 'word_pronunciation'
   
-  root :to => 'lookup#index'
+  root :to => 'home#index'
   
   devise_for :users, :path_prefix => 'd' 
 end
