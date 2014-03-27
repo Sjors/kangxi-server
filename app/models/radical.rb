@@ -1,6 +1,4 @@
 class Radical < ActiveRecord::Base
-  default_scope -> { order(id: :asc) }
-  
   # validates_uniqueness_of :simplified  # Exception: 罒 belongs to radical 112 and 109
   validates_length_of :simplified, :is => 1
   validates :position, :inclusion => 1..214
@@ -73,7 +71,7 @@ class Radical < ActiveRecord::Base
   end
   
   def self.export_radicals(f)
-    self.all.each do |first_radical|
+    self.where(is_synonym: false).where("frequency < ?", 100).order(frequency: :desc).limit(100).each do |first_radical|
       f << "@autoreleasepool {\n"
       puts "#{ first_radical }..."
       f << "  NSLog(@\"#{ first_radical }...\");\n"
