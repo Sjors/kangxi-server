@@ -447,9 +447,5 @@ namespace :organize do
         puts "#{radical} #{ frequency }: #{ (radical.no_screen_characters - [Character.find_by(simplified: radical.simplified)]).join(' ') }"
       end
     end
-  
-  
-  
- 
   end
 end
