@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20130825121529) do
+ActiveRecord::Schema.define(version: 20140327195722) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,10 +21,6 @@ ActiveRecord::Schema.define(version: 20130825121529) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "level"
-    t.boolean  "first_screen",  default: false
-    t.boolean  "second_screen", default: false
-    t.boolean  "third_screen",  default: false
-    t.boolean  "fourth_screen", default: false
   end
 
   create_table "characters_radicals", force: true do |t|
@@ -48,23 +44,16 @@ ActiveRecord::Schema.define(version: 20130825121529) do
   create_table "radicals", force: true do |t|
     t.integer  "position"
     t.string   "simplified"
-    t.boolean  "variant",                 default: false
+    t.boolean  "variant",        default: false
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "first_screen",            default: false
     t.string   "note"
-    t.integer  "radicals",                default: [],    array: true
-    t.boolean  "ambiguous",               default: false
-    t.integer  "frequency",               default: 0
-    t.boolean  "second_screen",           default: false
-    t.integer  "second_screen_frequency", default: 0
-    t.integer  "secondary_radicals",      default: [],    array: true
-    t.integer  "tertiary_radicals",       default: [],    array: true
-    t.boolean  "third_screen",            default: false
-    t.integer  "third_screen_frequency",  default: 0
-    t.integer  "synonyms",                default: [],    array: true
-    t.boolean  "is_synonym",              default: false
-    t.integer  "do_not_confuse",          default: [],    array: true
+    t.integer  "radicals",       default: [],    array: true
+    t.boolean  "ambiguous",      default: false
+    t.integer  "frequency",      default: 0
+    t.integer  "synonyms",       default: [],    array: true
+    t.boolean  "is_synonym",     default: false
+    t.integer  "do_not_confuse", default: [],    array: true
   end
 
   create_table "users", force: true do |t|

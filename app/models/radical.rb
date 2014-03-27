@@ -18,10 +18,6 @@ class Radical < ActiveRecord::Base
     return tally
   end
   
-  def currently_unmatched_characters 
-    self.characters.where("characters.id not in (?)", Character.unmatched_by_first_screen_ids ).references(:character)
-  end
-  
   def with_synonym_characters
     return self.characters.group("characters.id") if self.synonyms.count == 0
     Character.joins(:radicals).where("level = 1 OR level = 2").where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
@@ -40,76 +36,17 @@ class Radical < ActiveRecord::Base
     self.simplified
   end
   
-  # This includes secondary and tertiary matches
-  def first_screen_matches(warn)
+  def matches(warn)
     characters = []
-    Radical.where("id in (?)", (self.first_screen ? [self.radicals, self.secondary_radicals].flatten : [])).each do |second_radical|      
+    Radical.where("id in (?)", self.radicals).each do |second_radical|      
       matches = self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
-      characters << matches.to_a.slice(0,35)
-      if matches.count > 20 && warn 
-        puts "#{ self } #{ second_radical } matches #{ matches.count } characters, 35 allowed."
+      characters << matches.to_a.slice(0,50)
+      if matches.count > 50 && warn 
+        puts "#{ self } #{ second_radical } matches #{ matches.count } characters, 50 allowed."
       end
     end
-    
-    # Tertiary matches:
-    tertiary_matches = []
-    Radical.where("id in (?)", (self.first_screen ? [self.tertiary_radicals].flatten : [])).each do |second_radical|      
-      tertiary_matches << self.characters.keep_if{|character| character.has_radicals(self, second_radical)}
-    end
-      
-    # Show tertiary characters directly, so cut off at 35. Won't fit on one screen, 
-    # but that's alright for these few exceptions
-    tertiary_matches = tertiary_matches.flatten.uniq
-    
-    if tertiary_matches.count > 35 && warn
-      puts "Ignoring #{ tertiary_matches.count - 35 } matches for #{ self }"
-    end
-    characters << tertiary_matches.to_a.slice(0,35)
     
     characters.flatten.uniq
-  end
-  
-  # Does not include secondary or tertiary matches (because there aren't any)
-  def second_screen_matches(warn)
-    matching_characters = []
-    Radical.where("id in (?)", self.radicals).each do |second_radical|
-      matches = self.second_screen_potential_characters.to_a.keep_if{|character| character.has_radicals(self, second_radical)}
-      matching_characters << matches
-      if matches.count > 20 && warn
-        puts "#{ first_radical } #{ second_radical } matches #{ matches.count } characters, 35 allowed."
-      end
-    end
-    
-    matching_characters.flatten.uniq.slice(0,35)
-  end
-  
-  # Does not include secondary or tertiary matches (because there aren't any)
-  def third_screen_matches(warn)
-    matching_characters = []
-
-    matches = self.third_screen_potential_characters.to_a.flatten.uniq
-    
-    if matches.count > 20 && warn
-      puts "#{ self } in third screen matches #{ matches.count } characters, 35 allowed."
-    end
-    
-    matches.slice(0,35)
-  end
-  
-  def second_screen_potential_characters
-    # self.characters.where(first_screen: false)
-    Character.joins(:radicals).where(first_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
-  end
-  
-  def third_screen_potential_characters
-    # self.characters.where(first_screen: false, second_screen: false)
-    Character.joins(:radicals).where(first_screen: false, second_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
-    
-  end
-  
-  def no_screen_characters
-    # self.characters.where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false)
-    Character.joins(:radicals).where(first_screen: false, second_screen: false, third_screen: false, fourth_screen: false).where("radicals.id = ? OR radicals.id IN (?)", self.id, self.synonyms).group("characters.id")
   end
   
   def tooltip
@@ -125,34 +62,6 @@ class Radical < ActiveRecord::Base
     tips.join("\n")
   end
   
-  def self.first_screen_radicals
-    self.where(first_screen: true)
-  end
-  
-  def self.second_screen_by_frequency
-    Radical.where("radicals.first_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ?", false).to_a.count]
-    }.sort_by{|a| -a[1] }.collect{|a| a[0]}
-      # joins(:characters).where(first_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
-  end
-  
-  def self.third_screen_by_frequency
-    Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ?", false, false).to_a.count]
-    }.sort_by{|a| -a[1] }.collect{|a| a[0]}
-    
-    # Radical.where("radicals.first_screen = ? and radicals.second_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false).joins(:characters).where(first_screen: false, second_screen: false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
-  end
-  
-  def self.no_screen_by_frequency
-    Radical.where("radicals.first_screen = ? and radicals.second_screen = ?  and radicals.first_screen = ? and ambiguous = ? and is_synonym = ?", false, false, false, false, false).collect {|r|
-      [r, r.with_synonym_characters.where("characters.first_screen = ? AND characters.second_screen = ? AND characters.second_screen = ?", false, false, false).to_a.count]
-    }.sort_by{|a| -a[1] }.collect{|a| a[0]}
-    
-    
-    # Radical.where("radicals.third_screen = ? and radicals.second_screen = ? and radicals.first_screen = ? and is_synonym = ?", false, false, false).joins(:characters).where("characters.first_screen = ? AND characters.second_screen = ? AND characters.third_screen = ? AND characters.fourth_screen = ?", false, false, false, false).select('radicals.*, count("characters".id) as "character_count"').group("radicals.id").order('character_count desc')
-  end
-  
   def self.make_synonyms(primary, synonyms)
     first = Radical.find_by(simplified: primary) 
     second = synonyms.collect {| synonym | Radical.find_by(simplified: synonym) }
@@ -163,14 +72,8 @@ class Radical < ActiveRecord::Base
     end
   end
   
-  def self.export_screen_1_and_2_radicals(screen, f)
-    if screen == 1
-      @radicals = self.where(first_screen: true).to_a #.slice(0,1) # DEBUG
-    else
-      @radicals = self.where(second_screen: true).to_a #.slice(0,2) # DEBUG
-    end
-    
-    @radicals.each do |first_radical|
+  def self.export_radicals(f)
+    self.all.each do |first_radical|
       f << "@autoreleasepool {\n"
       puts "#{ first_radical }..."
       f << "  NSLog(@\"#{ first_radical }...\");\n"
@@ -179,35 +82,10 @@ class Radical < ActiveRecord::Base
       f << "  r.isFirstRadical = @YES;\n"
       f << "  r.simplified = @\"#{ first_radical.simplified }\";\n"
       f << "  r.rank = @#{ first_radical.rank };\n"
-      f << "  r.section = @#{ screen - 1 };\n"  
+      f << "  r.section = @#{ 0 };\n"  
       f << "\n"
       primary_second_radicals = Radical.where("id in (?)", first_radical.radicals).to_a #.slice(0,5) # DEBUG
-      self.export_second_radicals(primary_second_radicals, f, false, screen, :primary, first_radical)
-
-      # Only first screen:
-      if screen  == 1
-        # These aren't on the second screen, because there just aren't enough to make it worth it.
-        secondary_second_radicals = Radical.where("id in (?)", first_radical.secondary_radicals).to_a #.slice(0,5) # DEBUG
-        self.export_second_radicals(secondary_second_radicals, f, false, 1, :secondary,first_radical)
-        
-       
-        tertiary_second_radicals = Radical.where("id in (?)", first_radical.tertiary_radicals).to_a #.slice(0,5) # DEBUG
-        # These are displayed as characters:
-        @characters = []
-    
-        tertiary_second_radicals.each do |second_radical|      
-          @characters << first_radical.with_synonym_characters.keep_if{|character| character.has_radicals(first_radical, second_radical)}
-        end
-    
-        @characters.flatten!
-        
-        unless @characters.nil? 
-          @characters.uniq!.to_a.slice(0,35)
-          f << "  r2 = r;";
-          self.export_characters(f, @characters, first_radical)
-        end
-
-      end
+      self.export_second_radicals(primary_second_radicals, f, false, first_radical)
 
       self.export_save_context(f)
       f << "}\n" # End of auto release pool
@@ -226,21 +104,7 @@ class Radical < ActiveRecord::Base
     f << "\n\n"
   end
   
-  def self.export_screen_3_radicals(f)
-    radicals = self.where(third_screen: true).to_a #.slice(0,2) # DEBUG
-    self.export_second_radicals(radicals, f, true, 3, :primary, nil)
-    self.export_save_context(f)
-  end
-  
-  def self.export_screen_4_radicals(f)
-    self.export_characters(f, Character.where(fourth_screen: true), nil)
-    self.export_save_context(f)
-  end
-  
-  def self.export_second_radicals(second_radicals, f, without_first_radical, screen, primary_secondary, first_radical)
-    pmt = 1 if primary_secondary == :primary
-    pmt = 2 if primary_secondary == :secondary
-        
+  def self.export_second_radicals(second_radicals, f, without_first_radical, first_radical)
     second_radicals.each do |second_radical|
       f << "  r2 = [NSEntityDescription insertNewObjectForEntityForName:kEntityRadical\n"  
       f << "               inManagedObjectContext:managedObjectContext];\n"
@@ -250,17 +114,11 @@ class Radical < ActiveRecord::Base
         f << "  r2.section = @2;\n"  
       else
         f << "  r2.firstRadical = r;\n"
-        f << "  r2.section = @#{ pmt - 1 };\n"  
+        f << "  r2.section = @#{ 0 };\n"  
       end
       f << "  r2.simplified = @\"#{ second_radical.simplified }\";\n"
       f << "  r2.rank = @#{ second_radical.rank };\n"
-      if screen == 1
-        @characters = first_radical.with_synonym_characters.where(first_screen: true).keep_if{|c| c.has_radicals(first_radical, second_radical)}
-      elsif screen == 2
-        @characters = first_radical.with_synonym_characters.where(second_screen: true).keep_if{|c| c.has_radicals(first_radical, second_radical)}
-      elsif screen == 3
-        @characters = second_radical.with_synonym_characters.where(third_screen: true).to_a
-      end
+      @characters = first_radical.with_synonym_characters.keep_if{|c| c.has_radicals(first_radical, second_radical)}
     
       self.export_characters(f, @characters, second_radical)
     end
