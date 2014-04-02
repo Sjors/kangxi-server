@@ -84,7 +84,7 @@ class Radical < ActiveRecord::Base
           {
             simplified: second_radical.simplified,
             rank: -second_radical.frequency, # TODO: frequency given first radical
-            demo: second_radical.demo,
+            demo: second_radical.demo && first_radical.with_synonym_characters.keep_if{|c| c.demo && c.has_radicals(first_radical, second_radical)}.count > 0,
             characters: first_radical.with_synonym_characters.keep_if{|c| c.has_radicals(first_radical, second_radical)}.collect {|character|
               {
                 simplified: character.simplified,
