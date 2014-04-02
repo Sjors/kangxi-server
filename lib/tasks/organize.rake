@@ -98,9 +98,33 @@ namespace :organize do
     
     Character.where(level: 1).each do |c|
       c.update demo: true
+    end
+    
+    # Blacklist some characters:
+    "今了零买候他书她习七他她九热吃椅打了作那语会五院二些来关兴六期八分".split(//).uniq.each do |c|
+      Character.find_by(simplified: c).update demo: false
+    end
+
+    Character.where(demo: true).each do |c|
       c.radicals.where(demo: false).each do |r|
         r.update demo: true
       end
     end
+    
+    # Reduce the number of radicals in the demo for simplicity:
+    Radical.find_by(simplified: "一").update demo: false 
+    Radical.find_by(simplified: "丨").update demo: false
+    Radical.find_by(simplified: "丶").update demo: false
+    Radical.find_by(simplified: "丿").update demo: false    
+    Radical.find_by(simplified: "二").update demo: false
+    Radical.find_by(simplified: "丷").update demo: false
+    Radical.find_by(simplified: "ハ").update demo: false
+    Radical.find_by(simplified: "八").update demo: false 
+    Radical.find_by(simplified: "𠃊").update demo: false
+    Radical.find_by(simplified: "乛").update demo: false
+    Radical.find_by(simplified: "卜").update demo: false
+    
+    
+    
   end
 end
