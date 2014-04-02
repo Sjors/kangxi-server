@@ -79,14 +79,17 @@ class Radical < ActiveRecord::Base
       {
         simplified: first_radical.simplified,
         rank: -first_radical.frequency,
+        demo: first_radical.demo,
         second_radicals: Radical.where("id in (?)", first_radical.radicals).collect{|second_radical|
           {
             simplified: second_radical.simplified,
             rank: -second_radical.frequency, # TODO: frequency given first radical
+            demo: second_radical.demo,
             characters: first_radical.with_synonym_characters.keep_if{|c| c.has_radicals(first_radical, second_radical)}.collect {|character|
               {
                 simplified: character.simplified,
-                rank: character.rank
+                rank: character.rank,
+                demo: character.demo
               }
             } 
           }         

@@ -1,5 +1,5 @@
 namespace :organize do 
-  task :all => [:clean, :ambiguous, :synonyms, :freq_count, :divide]
+  task :all => [:clean, :ambiguous, :synonyms, :freq_count, :divide, :demo]
   
   desc "Clean"
   task :clean => :environment do
@@ -90,4 +90,17 @@ namespace :organize do
       radical.update radicals: frequencies.collect{|f| f[0].id}
     end
   end  
+  
+  desc "Mark radicals and characters for demo mode"
+  task :demo => :environment do
+    Radical.update_all("demo = false")
+    Character.update_all("demo = false")
+    
+    Character.where(level: 1).each do |c|
+      c.update demo: true
+      c.radicals.where(demo: false).each do |r|
+        r.update demo: true
+      end
+    end
+  end
 end

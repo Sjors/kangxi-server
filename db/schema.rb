@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140327195722) do
+ActiveRecord::Schema.define(version: 20140402134021) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20140327195722) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "level"
+    t.boolean  "demo",       default: false
   end
 
   create_table "characters_radicals", force: true do |t|
@@ -54,6 +55,7 @@ ActiveRecord::Schema.define(version: 20140327195722) do
     t.integer  "synonyms",       default: [],    array: true
     t.boolean  "is_synonym",     default: false
     t.integer  "do_not_confuse", default: [],    array: true
+    t.boolean  "demo",           default: false
   end
 
   create_table "users", force: true do |t|
